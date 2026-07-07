@@ -864,58 +864,22 @@ function exportExcel(){
   XLSX.writeFile(wb, 'postavki.xlsx');
 }
 
-const CLOUD_REPO = 'kooovash-ux/shipments-tracker';
-const CLOUD_PATH = 'data/shipments.json';
-
-function getCloudToken(){
-  return localStorage.getItem('cloud_gh_token') || '';
-}
-
-function setCloudToken(token){
-  localStorage.setItem('cloud_gh_token', token);
-}
+const CLOUD_BLOB = '019f3bd0-615c-78ab-96eb-c19649f58ee6';
 
 async function saveToCloud(){
-  const token = getCloudToken();
-  if(!token){
-    const t = prompt('Введите GitHub Personal Access Token (repo):\n\nСоздать: github.com/settings/tokens/new');
-    if(!t) return;
-    setCloudToken(t);
-  }
   const btn = document.getElementById('cloudSaveBtn');
   btn.textContent = '☁ Сохраняю...';
   btn.disabled = true;
   try{
-    const data = JSON.stringify({entries, nextId});
-    const base64 = btoa(unescape(encodeURIComponent(data)));
-    let sha = '';
-    try{
-      const existing = await fetch(`https://api.github.com/repos/${CLOUD_REPO}/contents/${CLOUD_PATH}`, {
-        headers: {Authorization: 'Bearer ' + getCloudToken(), Accept: 'application/vnd.github.v3+json'}
-      });
-      if(existing.ok){
-        const ex = await existing.json();
-        sha = ex.sha;
-      }
-    }catch(e){}
-    const body = {message: 'sync shipments', content: base64};
-    if(sha) body.sha = sha;
-    const res = await fetch(`https://api.github.com/repos/${CLOUD_REPO}/contents/${CLOUD_PATH}`, {
+    const res = await fetch('https://jsonblob.com/api/jsonBlob/' + CLOUD_BLOB, {
       method: 'PUT',
-      headers: {Authorization: 'Bearer ' + getCloudToken(), 'Content-Type': 'application/json', Accept: 'application/vnd.github.v3+json'},
-      body: JSON.stringify(body)
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({entries, nextId})
     });
-    if(!res.ok){
-      const err = await res.json();
-      throw new Error(err.message || 'HTTP ' + res.status);
-    }
+    if(!res.ok) throw new Error('HTTP ' + res.status);
     showToast('Сохранено в облако');
   }catch(e){
     showToast('Ошибка: ' + e.message);
-    if(e.message.includes('Bad credentials') || e.message.includes('401')){
-      localStorage.removeItem('cloud_gh_token');
-      showToast('Токен недействителен — введите новый');
-    }
   }finally{
     btn.textContent = '☁ Сохранить';
     btn.disabled = false;
@@ -924,36 +888,17 @@ async function saveToCloud(){
 
 async function loadFromCloud(){
   try{
-    const res = await fetch(`https://api.github.com/repos/${CLOUD_REPO}/contents/${CLOUD_PATH}`, {
-      headers: {Accept: 'application/vnd.github.v3+json'}
-    });
-    if(res.status === 404){
-      showToast('В облаке пока нет данных');
-      return;
-    }
-    if(!res.ok){
-      showToast('Ошибка загрузки: ' + res.status);
-      return;
-    }
-    const data = await res.json();
-    const json = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-    if(!json.entries || !json.entries.length){
-      showToast('В облаке пусто');
-      return;
-    }
-    if(entries.length > 0){
-      if(!confirm('Текущие данные (' + entries.length + ' записей) будут заменены облачными (' + json.entries.length + '). Продолжить?')) return;
-    }
+    const res = await fetch('https://jsonblob.com/api/jsonBlob/' + CLOUD_BLOB);
+    if(!res.ok) return;
+    const json = await res.json();
+    if(!json.entries || !json.entries.length) return;
     entries = json.entries;
     nextId = json.nextId || (entries.length + 1);
     editingId = null;
     clearForm();
     saveEntries();
     render();
-    showToast('Загружено ' + entries.length + ' записей из облака');
-  }catch(e){
-    showToast('Ошибка загрузки: ' + e.message);
-  }
+  }catch(e){}
 }
 
 document.getElementById('f_from').addEventListener('blur', () => autofillCountry('f_from'));
