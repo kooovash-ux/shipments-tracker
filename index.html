@@ -467,8 +467,6 @@
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
       <button class="btn-ghost" onclick="exportCSV()">CSV</button>
       <button class="btn-primary" onclick="exportExcel()">Excel</button>
-      <button class="btn-ghost" id="cloudSaveBtn" onclick="saveToCloud()" style="border-color:var(--green);color:var(--green);">☁ Сохранить</button>
-      <button class="btn-ghost" onclick="loadFromCloud()" style="border-color:#5a7c99;color:#5a7c99;">☁ Загрузить</button>
     </div>
   </div>
   <div class="table-wrap">
@@ -534,9 +532,10 @@ async function checkPassword(){
 function unlockApp(){
   document.getElementById('authGate').style.display = 'none';
   document.getElementById('appContent').style.display = 'block';
-  loadEntries();
+  loadFromCloud().then(loaded => {
+    if(!loaded) loadEntries();
+  });
 }
-
 document.getElementById('authInput1').addEventListener('keydown', (ev) => {
   if(ev.key === 'Enter') checkPassword();
 });
@@ -643,6 +642,35 @@ async function saveEntries(){
   }catch(e){
     showToast('Не удалось сохранить — попробуйте ещё раз');
   }
+  syncToCloud();
+}
+
+let _cloudTimer = null;
+function syncToCloud(){
+  if(_cloudTimer) clearTimeout(_cloudTimer);
+  _cloudTimer = setTimeout(async () => {
+    try{
+      const data = JSON.stringify({entries, nextId});
+      const base64 = btoa(unescape(encodeURIComponent(data)));
+      let sha = '';
+      try{
+        const ex = await fetch('https://api.github.com/repos/' + CLOUD_REPO + '/contents/' + CLOUD_PATH, {
+          headers: {Authorization: 'Bearer ' + CLOUD_T1 + CLOUD_T2, Accept: 'application/vnd.github.v3+json'}
+        });
+        if(ex.ok){
+          const exj = await ex.json();
+          sha = exj.sha;
+        }
+      }catch(e){}
+      const body = {message: 'sync', content: base64};
+      if(sha) body.sha = sha;
+      await fetch('https://api.github.com/repos/' + CLOUD_REPO + '/contents/' + CLOUD_PATH, {
+        method: 'PUT',
+        headers: {Authorization: 'Bearer ' + CLOUD_T1 + CLOUD_T2, 'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+      });
+    }catch(e){}
+  }, 2000);
 }
 
 function showToast(msg){
@@ -869,59 +897,27 @@ const CLOUD_PATH = 'data/shipments.json';
 const CLOUD_T1 = 'gho_QEh';
 const CLOUD_T2 = 'QMcgTa8qb617YSIPkcgGjzOoyJv35L7YQ';
 
-async function saveToCloud(){
-  const btn = document.getElementById('cloudSaveBtn');
-  btn.textContent = '☁ Сохраняю...';
-  btn.disabled = true;
-  try{
-    const data = JSON.stringify({entries, nextId});
-    const base64 = btoa(unescape(encodeURIComponent(data)));
-    let sha = '';
-    try{
-      const ex = await fetch('https://api.github.com/repos/' + CLOUD_REPO + '/contents/' + CLOUD_PATH, {
-        headers: {Authorization: 'Bearer ' + CLOUD_T1 + CLOUD_T2, Accept: 'application/vnd.github.v3+json'}
-      });
-      if(ex.ok){
-        const exj = await ex.json();
-        sha = exj.sha;
-      }
-    }catch(e){}
-    const body = {message: 'sync shipments', content: base64};
-    if(sha) body.sha = sha;
-    const res = await fetch('https://api.github.com/repos/' + CLOUD_REPO + '/contents/' + CLOUD_PATH, {
-      method: 'PUT',
-      headers: {Authorization: 'Bearer ' + CLOUD_T1 + CLOUD_T2, 'Content-Type': 'application/json'},
-      body: JSON.stringify(body)
-    });
-    if(!res.ok){
-      const err = await res.json();
-      throw new Error(err.message || 'HTTP ' + res.status);
-    }
-    showToast('Сохранено в облако');
-  }catch(e){
-    showToast('Ошибка: ' + e.message);
-  }finally{
-    btn.textContent = '☁ Сохранить';
-    btn.disabled = false;
-  }
-}
-
 async function loadFromCloud(){
   try{
     const res = await fetch('https://api.github.com/repos/' + CLOUD_REPO + '/contents/' + CLOUD_PATH, {
       headers: {Accept: 'application/vnd.github.v3+json'}
     });
-    if(!res.ok) return;
+    if(!res.ok) return false;
     const data = await res.json();
     const json = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-    if(!json.entries || !json.entries.length) return;
+    if(!json.entries || !json.entries.length) return false;
     entries = json.entries;
     nextId = json.nextId || (entries.length + 1);
     editingId = null;
     clearForm();
-    saveEntries();
+    try{
+      await storageAPI.set('shipments-list', JSON.stringify({entries, nextId}), false);
+    }catch(e){}
     render();
-  }catch(e){}
+    return true;
+  }catch(e){
+    return false;
+  }
 }
 
 document.getElementById('f_from').addEventListener('blur', () => autofillCountry('f_from'));
