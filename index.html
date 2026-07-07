@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Поставки — учёт</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --green:#21A038;
+    --green-dark:#178a2c;
+    --navy:#0F1B2D;
+    --navy-soft:#16243A;
+    --bg:#FFFFFF;
+    --panel:#FFFFFF;
+    --panel-2:#F4F6F9;
+    --border:#E1E6ED;
+    --text:#16243A;
+    --text-dim:#6B7A90;
+    --red:#D6433C;
+    --mono:'JetBrains Mono', 'Courier New', monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    padding:28px 20px 60px;
+  }
+  h1{
+    font-size:20px;
+    font-weight:700;
+    margin:0 0 4px;
+    letter-spacing:-0.01em;
+  }
+  .sub{
+    color:var(--text-dim);
+    font-size:13px;
+    margin:0 0 24px;
+  }
+  .card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:20px;
+    margin-bottom:20px;
+    box-shadow:0 1px 3px rgba(16,36,58,0.04);
+  }
+  .card h2{
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--text-dim);
+    margin:0 0 16px;
+    font-weight:600;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(180px,1fr));
+    gap:12px;
+  }
+  .field{display:flex; flex-direction:column; gap:6px;}
+  .field label{font-size:12px; color:var(--text-dim);}
+  .field input, .field select{
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:8px;
+    padding:9px 10px;
+    font-size:13px;
+    font-family:inherit;
+    width:100%;
+  }
+  .field input:focus, .field select:focus{
+    outline:none;
+    border-color:var(--green);
+  }
+  .field input[type="date"]{
+    color-scheme:light;
+  }
+  .row-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:16px;
+  }
+  button{
+    font-family:inherit;
+    font-size:13px;
+    border-radius:8px;
+    padding:10px 16px;
+    border:1px solid transparent;
+    cursor:pointer;
+    font-weight:600;
+  }
+  .btn-primary{
+    background:var(--green);
+    color:#fff;
+  }
+  .btn-primary:hover{background:var(--green-dark);}
+  .btn-ghost{
+    background:transparent;
+    border-color:var(--border);
+    color:var(--text-dim);
+  }
+  .btn-ghost:hover{color:var(--text); border-color:var(--text-dim);}
+  .rates{
+    display:flex;
+    flex-wrap:wrap;
+    gap:20px;
+    align-items:center;
+  }
+  .rates .field{max-width:160px;}
+  .currency-toggle{
+    display:flex;
+    gap:6px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:3px;
+  }
+  .currency-toggle button{
+    background:transparent;
+    color:var(--text-dim);
+    padding:6px 14px;
+    border-radius:6px;
+    font-size:12px;
+  }
+  .currency-toggle button.active{
+    background:var(--green);
+    color:#fff;
+  }
+  .table-wrap{
+    overflow-x:auto;
+    border:1px solid var(--border);
+    border-radius:12px;
+  }
+  table{
+    border-collapse:collapse;
+    width:100%;
+    min-width:1200px;
+    font-size:12.5px;
+  }
+  thead th{
+    background:var(--panel-2);
+    color:var(--text-dim);
+    text-transform:uppercase;
+    font-size:10.5px;
+    letter-spacing:.04em;
+    font-weight:600;
+    padding:10px 10px;
+    text-align:left;
+    white-space:nowrap;
+    border-bottom:1px solid var(--border);
+    position:sticky;
+    top:0;
+  }
+  tbody td{
+    padding:9px 10px;
+    border-bottom:1px solid var(--border);
+    white-space:nowrap;
+    font-family:var(--mono);
+    font-size:12px;
+  }
+  tbody tr:hover{background:rgba(33,160,56,0.05);}
+  .num{text-align:right;}
+  .pos{color:var(--green);}
+  .neg{color:var(--red);}
+  .badge{
+    display:inline-block;
+    padding:2px 8px;
+    border-radius:20px;
+    font-size:10.5px;
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    background:rgba(33,160,56,0.15);
+    color:var(--green);
+  }
+  .badge.status-transit{background:rgba(217,155,17,0.14); color:#9A6B0C;}
+  .badge.status-done{background:rgba(33,160,56,0.15); color:var(--green-dark);}
+  .badge.status-plan{background:rgba(107,122,144,0.14); color:var(--text-dim);}
+  .del-btn{
+    background:transparent;
+    border:none;
+    color:var(--text-dim);
+    cursor:pointer;
+    font-size:14px;
+    padding:2px 6px;
+  }
+  .del-btn:hover{color:var(--red);}
+  .bx-link{
+    color:var(--green);
+    text-decoration:none;
+    border-bottom:1px dotted var(--green);
+  }
+  .bx-link:hover{
+    color:#3fd15c;
+    border-bottom-style:solid;
+  }
+  .empty{
+    padding:40px;
+    text-align:center;
+    color:var(--text-dim);
+    font-size:13px;
+  }
+  .toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-bottom:12px;
+  }
+  .toast{
+    position:fixed;
+    bottom:24px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--panel-2);
+    border:1px solid var(--green);
+    color:var(--text);
+    padding:10px 18px;
+    border-radius:8px;
+    font-size:13px;
+    opacity:0;
+    transition:all .25s ease;
+    pointer-events:none;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .hint{font-size:11.5px; color:var(--text-dim); margin-top:2px;}
+
+  .auth-gate{
+    position:fixed;
+    inset:0;
+    background:var(--bg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:1000;
+    padding:20px;
+  }
+  .auth-box{
+    width:100%;
+    max-width:320px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:26px;
+    box-shadow:0 4px 20px rgba(16,36,58,0.08);
+  }
+  .auth-box input{
+    width:100%;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:8px;
+    padding:10px 12px;
+    font-size:13px;
+    font-family:inherit;
+  }
+  .auth-box input:focus{outline:none; border-color:var(--green);}
+  .auth-box a{color:var(--text-dim);}
+  .auth-box a:hover{color:var(--green);}
+
+
+  .form-section{
+    margin-bottom:22px;
+    padding-bottom:22px;
+    border-bottom:1px solid var(--border);
+  }
+  .form-section:last-of-type{
+    border-bottom:none;
+    margin-bottom:4px;
+    padding-bottom:0;
+  }
+  .section-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .section-num{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:22px;
+    height:22px;
+    border-radius:6px;
+    background:rgba(33,160,56,0.15);
+    color:var(--green);
+    font-size:12px;
+    font-weight:700;
+    font-family:var(--mono);
+    flex-shrink:0;
+  }
+  .section-title h3{
+    margin:0;
+    font-size:13px;
+    font-weight:600;
+    color:var(--text);
+  }
+  .section-title span.section-sub{
+    font-size:11.5px;
+    color:var(--text-dim);
+    font-weight:400;
+  }
+  .grid-section{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(180px,1fr));
+    gap:12px;
+  }
+  .amount-group{
+    display:flex;
+    gap:6px;
+  }
+  .amount-group input{
+    flex:1;
+    min-width:0;
+  }
+  .amount-group select{
+    width:78px;
+    flex-shrink:0;
+    padding-left:6px;
+    padding-right:4px;
+  }
+  @media (max-width: 640px){
+    body{padding:18px 12px 60px;}
+  }
+</style>
+</head>
+<body>
+
+<div id="authGate" class="auth-gate">
+  <div class="auth-box">
+    <h2 style="margin:0 0 6px; font-size:16px;">Вход</h2>
+    <p class="hint" style="margin:0 0 16px;">Введите пароль</p>
+    <input type="password" id="authInput1" placeholder="Пароль" style="margin-bottom:10px;">
+    <p id="authError" style="color:var(--red); font-size:12px; display:none; margin:0 0 10px;">Неверный пароль</p>
+    <button class="btn-primary" id="authBtn" style="width:100%;" onclick="checkPassword()">Войти</button>
+  </div>
+</div>
+
+<div id="appContent" style="display:none;">
+
+<div class="card">
+  <div class="toolbar" style="margin-bottom:16px;">
+    <h2 style="margin:0;">Заявка</h2>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <div id="editingBadge" style="font-size:12px; color:var(--text-dim); display:none;">
+        Редактируется существующая заявка — жмите «Сохранить изменения», чтобы не создать дубль
+      </div>
+      <button class="btn-ghost" id="entryToggleBtn" onclick="toggleEntryPanel()">Показать / скрыть</button>
+    </div>
+  </div>
+  <div id="entryFormPanel" style="display:none;">
+  <div class="form-section">
+    <div class="section-title">
+      <div class="section-num">1</div>
+      <h3>Откуда — куда</h3>
+      <span class="section-sub">маршрут и стороны сделки</span>
+    </div>
+    <div class="grid-section">
+      <div class="field"><label>№ Битрикс</label><input type="text" id="f_bitrix" placeholder="напр. 1893"></div>
+      <div class="field"><label>Откуда</label><input type="text" id="f_from" placeholder="Шанхай"><span class="hint">впишите город — страна подставится сама</span></div>
+      <div class="field"><label>Куда</label><input type="text" id="f_to" placeholder="Санкт-Петербург"><span class="hint">впишите город — страна подставится сама</span></div>
+      <div class="field"><label>Клиент</label><input type="text" id="f_client" placeholder="Название клиента"></div>
+      <div class="field"><label>Подрядчик</label><input type="text" id="f_supplier" placeholder="Название подрядчика"></div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="section-title">
+      <div class="section-num">2</div>
+      <h3>Груз и доставка</h3>
+      <span class="section-sub">что везём и каким способом</span>
+    </div>
+    <div class="grid-section">
+      <div class="field"><label>Груз</label><input type="text" id="f_cargo" placeholder="Что за груз"></div>
+      <div class="field">
+        <label>Тип транспорта</label>
+        <select id="f_transport">
+          <option>FCL</option><option>LCL</option><option>AIR</option><option>FTL</option><option>LTL</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Статус</label>
+        <select id="f_status">
+          <option>Планируется</option><option>В пути</option><option>Прибыл</option>
+          <option>Растаможен</option><option>Доставлен</option><option>Закрыт</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="section-title">
+      <div class="section-num">3</div>
+      <h3>Даты</h3>
+      <span class="section-sub">выход и прибытие груза</span>
+    </div>
+    <div class="grid-section">
+      <div class="field"><label>Дата выхода груза</label><input type="date" id="f_depart"></div>
+      <div class="field"><label>Дата прибытия</label><input type="date" id="f_arrive"></div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="section-title">
+      <div class="section-num">4</div>
+      <h3>Деньги</h3>
+      <span class="section-sub">валюта, план и факт</span>
+    </div>
+    <div class="grid-section">
+      <div class="field">
+        <label>План. себестоимость</label>
+        <div class="amount-group">
+          <input type="number" id="f_plan_cost" step="0.01">
+          <select id="f_plan_cost_cur">
+            <option value="USD">USD</option><option value="CNY">CNY</option><option value="INR">INR</option>
+            <option value="RUB">RUB</option><option value="EUR">EUR</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>План. сумма продажи</label>
+        <div class="amount-group">
+          <input type="number" id="f_plan_sale" step="0.01">
+          <select id="f_plan_sale_cur">
+            <option value="USD">USD</option><option value="CNY">CNY</option><option value="INR">INR</option>
+            <option value="RUB">RUB</option><option value="EUR">EUR</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Факт. себестоимость</label>
+        <div class="amount-group">
+          <input type="number" id="f_fact_cost" step="0.01">
+          <select id="f_fact_cost_cur">
+            <option value="USD">USD</option><option value="CNY">CNY</option><option value="INR">INR</option>
+            <option value="RUB">RUB</option><option value="EUR">EUR</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Факт. сумма продажи</label>
+        <div class="amount-group">
+          <input type="number" id="f_fact_sale" step="0.01">
+          <select id="f_fact_sale_cur">
+            <option value="USD">USD</option><option value="CNY">CNY</option><option value="INR">INR</option>
+            <option value="RUB">RUB</option><option value="EUR">EUR</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row-actions">
+    <button class="btn-ghost" onclick="clearForm()">Очистить / новая заявка</button>
+    <button class="btn-primary" id="submitBtn" onclick="addRow()">Добавить в таблицу</button>
+  </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <h2 style="margin:0;">Таблица поставок</h2>
+    <div style="display:flex; gap:10px;">
+      <button class="btn-ghost" onclick="exportCSV()">Скачать CSV</button>
+      <button class="btn-primary" onclick="exportExcel()">Скачать Excel</button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>№</th><th>№ Bitrix</th><th>Откуда</th><th>Куда</th><th>Клиент</th><th>Подрядчик</th><th>Груз</th>
+          <th>Тип</th><th>Выход</th><th>Прибытие</th><th>Статус</th>
+          <th class="num">План. себес</th><th class="num">План. продажа</th><th class="num">План. маржа</th>
+          <th class="num">Факт. себес</th><th class="num">Факт. продажа</th><th class="num">Факт. маржа</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <div id="emptyState" class="empty" style="display:none;">Пока нет ни одной поставки — заполните форму выше.</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+</div>
+
+<script>
+let entries = [];
+let nextId = 1;
+let editingId = null;
+
+const storageAPI = {
+  async get(key, shared){
+    if(typeof window.storage !== 'undefined') return window.storage.get(key, shared);
+    const val = localStorage.getItem(key);
+    return val !== null ? {key, value: val, shared} : null;
+  },
+  async set(key, value, shared){
+    if(typeof window.storage !== 'undefined') return window.storage.set(key, value, shared);
+    localStorage.setItem(key, value);
+    return {key, value, shared};
+  },
+  async delete(key, shared){
+    if(typeof window.storage !== 'undefined') return window.storage.delete(key, shared);
+    localStorage.removeItem(key);
+    return {key, deleted:true, shared};
+  }
+};
+
+const APP_PASSWORD = '9761';
+
+function checkPassword(){
+  const p1 = document.getElementById('authInput1').value;
+  if(p1 === APP_PASSWORD){
+    unlockApp();
+  } else {
+    document.getElementById('authError').style.display = 'block';
+  }
+}
+
+function unlockApp(){
+  document.getElementById('authGate').style.display = 'none';
+  document.getElementById('appContent').style.display = 'block';
+  loadEntries();
+}
+
+document.getElementById('authInput1').addEventListener('keydown', (ev) => {
+  if(ev.key === 'Enter') checkPassword();
+});
+document.getElementById('authInput1').focus();
+
+const CITY_COUNTRY = {
+  // Китай
+  'шанхай':'Китай','гуанчжоу':'Китай','шэньчжэнь':'Китай','шеньчжэнь':'Китай','нинбо':'Китай',
+  'циндао':'Китай','тяньцзинь':'Китай','сямынь':'Китай','далянь':'Китай','дунгуань':'Китай',
+  'иу':'Китай','нанкин':'Китай','чэнду':'Китай','ухань':'Китай','сучжоу':'Китай','ханчжоу':'Китай',
+  'чунцин':'Китай','наньтун':'Китай','чжуншань':'Китай','фошань':'Китай','пекин':'Китай',
+  'сиань':'Китай','цзинань':'Китай','фучжоу':'Китай','харбин':'Китай','шаньтоу':'Китай',
+  'вэйхай':'Китай','яньтай':'Китай','чжэнчжоу':'Китай','куньмин':'Китай','наньнин':'Китай',
+  'хух-хото':'Китай','урумчи':'Китай','гонконг':'Китай','макао':'Китай',
+  // Индия
+  'мумбаи':'Индия','мумбай':'Индия','ченнаи':'Индия','ченнай':'Индия','дели':'Индия','нью-дели':'Индия',
+  'бангалор':'Индия','бенгалуру':'Индия','кочи':'Индия','кочин':'Индия','ахмедабад':'Индия',
+  'пуна':'Индия','пуне':'Индия','хайдарабад':'Индия','сурат':'Индия','калькутта':'Индия',
+  'колката':'Индия','джайпур':'Индия','нава-шева':'Индия','нхава-шева':'Индия','тутикорин':'Индия',
+  'вишакхапатнам':'Индия','гоа':'Индия','канпур':'Индия','лакхнау':'Индия',
+  // Россия
+  'москва':'Россия','санкт-петербург':'Россия','спб':'Россия','питер':'Россия','новосибирск':'Россия',
+  'екатеринбург':'Россия','хабаровск':'Россия','владивосток':'Россия','нижний новгород':'Россия',
+  'казань':'Россия','ростов-на-дону':'Россия','ростов':'Россия','краснодар':'Россия','самара':'Россия',
+  'уфа':'Россия','красноярск':'Россия','пермь':'Россия','воронеж':'Россия','волгоград':'Россия',
+  'челябинск':'Россия','омск':'Россия','саратов':'Россия','тольятти':'Россия','иркутск':'Россия',
+  'находка':'Россия','новороссийск':'Россия','архангельск':'Россия','мурманск':'Россия',
+  // Прочие торговые хабы
+  'сингапур':'Сингапур','токио':'Япония','осака':'Япония','иокогама':'Япония','пусан':'Южная Корея',
+  'сеул':'Южная Корея','инчхон':'Южная Корея','дубай':'ОАЭ','джебель-али':'ОАЭ','абу-даби':'ОАЭ',
+  'стамбул':'Турция','мерсин':'Турция','роттердам':'Нидерланды','амстердам':'Нидерланды',
+  'гамбург':'Германия','бремерхафен':'Германия','антверпен':'Бельгия','лондон':'Великобритания',
+  'саутгемптон':'Великобритания','нью-йорк':'США','лос-анджелес':'США','лонг-бич':'США',
+  'ташкент':'Узбекистан','алматы':'Казахстан','астана':'Казахстан','минск':'Беларусь',
+  'ереван':'Армения','баку':'Азербайджан','тбилиси':'Грузия','бангкок':'Таиланд',
+  'лаэм-чабанг':'Таиланд','хошимин':'Вьетнам','хайфон':'Вьетнам','джакарта':'Индонезия',
+  'коломбо':'Шри-Ланка','карачи':'Пакистан'
+};
+
+function autofillCountry(inputId){
+  const input = document.getElementById(inputId);
+  const val = input.value.trim();
+  if(!val || val.includes(',')) return;
+  const country = CITY_COUNTRY[val.toLowerCase()];
+  if(country) input.value = `${val}, ${country}`;
+}
+
+function fmtMoney(amount, currency){
+  if(amount === null || amount === undefined || amount === '' || isNaN(amount)) return null;
+  return curSymbol(currency) + fmt(amount);
+}
+
+function fmt(n){
+  if(n === null || n === undefined) return '—';
+  return n.toLocaleString('ru-RU', {maximumFractionDigits:0});
+}
+
+function curSymbol(c){
+  return {USD:'$', CNY:'¥', INR:'₹', RUB:'₽', EUR:'€'}[c] || '';
+}
+
+function fmtDate(d){
+  if(!d) return '—';
+  const [y,m,day] = d.split('-');
+  return `${day}.${m}.${y}`;
+}
+
+function bitrixLink(num){
+  if(!num) return '—';
+  const clean = String(num).trim();
+  const url = `https://prosco.bitrix24.ru/company/personal/user/11/tasks/task/view/${clean}/`;
+  return `<a href="${url}" target="_blank" rel="noopener" class="bx-link">${clean}</a>`;
+}
+
+async function loadEntries(){
+  try{
+    const res = await storageAPI.get('shipments-list', false);
+    if(res && res.value){
+      const parsed = JSON.parse(res.value);
+      entries = parsed.entries || [];
+      nextId = parsed.nextId || (entries.length + 1);
+      entries.forEach(e => {
+        if(e.currency && !e.planCostCur){
+          e.planCostCur = e.currency;
+          e.planSaleCur = e.currency;
+          e.factCostCur = e.currency;
+          e.factSaleCur = e.currency;
+        }
+        e.planCostCur = e.planCostCur || 'USD';
+        e.planSaleCur = e.planSaleCur || 'USD';
+        e.factCostCur = e.factCostCur || 'USD';
+        e.factSaleCur = e.factSaleCur || 'USD';
+      });
+    }
+  }catch(e){
+    entries = [];
+  }
+  render();
+}
+
+async function saveEntries(){
+  try{
+    await storageAPI.set('shipments-list', JSON.stringify({entries, nextId}), false);
+  }catch(e){
+    showToast('Не удалось сохранить — попробуйте ещё раз');
+  }
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+function clearForm(){
+  ['f_from','f_to','f_client','f_supplier','f_cargo','f_depart','f_arrive',
+   'f_plan_cost','f_plan_sale','f_fact_cost','f_fact_sale','f_bitrix'].forEach(id=>{
+    document.getElementById(id).value = '';
+  });
+  ['f_plan_cost_cur','f_plan_sale_cur','f_fact_cost_cur','f_fact_sale_cur'].forEach(id=>{
+    document.getElementById(id).selectedIndex = 0;
+  });
+  document.getElementById('f_transport').selectedIndex = 0;
+  document.getElementById('f_status').selectedIndex = 0;
+  editingId = null;
+  document.getElementById('editingBadge').style.display = 'none';
+  document.getElementById('submitBtn').textContent = 'Добавить в таблицу';
+}
+
+function toggleEntryPanel(){
+  const panel = document.getElementById('entryFormPanel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function editEntry(id){
+  const e = entries.find(en => en.id === id);
+  if(!e) return;
+  editingId = e.id;
+  document.getElementById('f_bitrix').value = e.bitrix || '';
+  document.getElementById('f_from').value = e.from || '';
+  document.getElementById('f_to').value = e.to || '';
+  document.getElementById('f_client').value = e.client || '';
+  document.getElementById('f_supplier').value = e.supplier || '';
+  document.getElementById('f_cargo').value = e.cargo || '';
+  document.getElementById('f_transport').value = e.transport || 'FCL';
+  document.getElementById('f_depart').value = e.depart || '';
+  document.getElementById('f_arrive').value = e.arrive || '';
+  document.getElementById('f_status').value = e.status || 'Планируется';
+  document.getElementById('f_plan_cost').value = e.planCost ?? '';
+  document.getElementById('f_plan_cost_cur').value = e.planCostCur || 'USD';
+  document.getElementById('f_plan_sale').value = e.planSale ?? '';
+  document.getElementById('f_plan_sale_cur').value = e.planSaleCur || 'USD';
+  document.getElementById('f_fact_cost').value = e.factCost ?? '';
+  document.getElementById('f_fact_cost_cur').value = e.factCostCur || 'USD';
+  document.getElementById('f_fact_sale').value = e.factSale ?? '';
+  document.getElementById('f_fact_sale_cur').value = e.factSaleCur || 'USD';
+  document.getElementById('editingBadge').style.display = 'block';
+  document.getElementById('submitBtn').textContent = 'Сохранить изменения';
+  document.getElementById('entryFormPanel').style.display = 'block';
+  document.getElementById('f_bitrix').closest('.card').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function addRow(){
+  const from = document.getElementById('f_from').value.trim();
+  const to = document.getElementById('f_to').value.trim();
+  if(!from || !to){
+    showToast('Заполните хотя бы "Откуда" и "Куда"');
+    return;
+  }
+  const data = {
+    bitrix: document.getElementById('f_bitrix').value.trim(),
+    from, to,
+    client: document.getElementById('f_client').value.trim(),
+    supplier: document.getElementById('f_supplier').value.trim(),
+    cargo: document.getElementById('f_cargo').value.trim(),
+    transport: document.getElementById('f_transport').value,
+    depart: document.getElementById('f_depart').value,
+    arrive: document.getElementById('f_arrive').value,
+    status: document.getElementById('f_status').value,
+    planCost: parseFloat(document.getElementById('f_plan_cost').value) || null,
+    planCostCur: document.getElementById('f_plan_cost_cur').value,
+    planSale: parseFloat(document.getElementById('f_plan_sale').value) || null,
+    planSaleCur: document.getElementById('f_plan_sale_cur').value,
+    factCost: parseFloat(document.getElementById('f_fact_cost').value) || null,
+    factCostCur: document.getElementById('f_fact_cost_cur').value,
+    factSale: parseFloat(document.getElementById('f_fact_sale').value) || null,
+    factSaleCur: document.getElementById('f_fact_sale_cur').value,
+  };
+
+  if(editingId !== null){
+    const idx = entries.findIndex(e => e.id === editingId);
+    if(idx !== -1){
+      entries[idx] = {...entries[idx], ...data};
+      saveEntries();
+      clearForm();
+      render();
+      showToast('Изменения сохранены');
+      return;
+    }
+  }
+
+  entries.push({id: nextId++, ...data});
+  saveEntries();
+  clearForm();
+  render();
+  showToast('Поставка добавлена');
+}
+
+function deleteRow(id){
+  entries = entries.filter(e => e.id !== id);
+  if(editingId === id) clearForm();
+  saveEntries();
+  render();
+}
+
+function statusClass(status){
+  if(status === 'Доставлен' || status === 'Закрыт') return 'status-done';
+  if(status === 'Планируется') return 'status-plan';
+  return 'status-transit';
+}
+
+function render(){
+  const tbody = document.getElementById('tbody');
+  const emptyState = document.getElementById('emptyState');
+  tbody.innerHTML = '';
+
+  if(entries.length === 0){
+    emptyState.style.display = 'block';
+    return;
+  }
+  emptyState.style.display = 'none';
+
+  entries.forEach((e, idx) => {
+    const planMargin = (e.planCost !== null && e.planSale !== null && e.planCostCur === e.planSaleCur)
+      ? {val: e.planSale - e.planCost, cur: e.planCostCur} : null;
+    const factMargin = (e.factCost !== null && e.factSale !== null && e.factCostCur === e.factSaleCur)
+      ? {val: e.factSale - e.factCost, cur: e.factCostCur} : null;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${idx+1}</td>
+      <td>${bitrixLink(e.bitrix)}</td>
+      <td>${e.from}</td>
+      <td>${e.to}</td>
+      <td>${e.client || '—'}</td>
+      <td>${e.supplier || '—'}</td>
+      <td>${e.cargo || '—'}</td>
+      <td>${e.transport}</td>
+      <td>${fmtDate(e.depart)}</td>
+      <td>${fmtDate(e.arrive)}</td>
+      <td><span class="badge ${statusClass(e.status)}">${e.status}</span></td>
+      <td class="num">${fmtMoney(e.planCost, e.planCostCur) ?? '—'}</td>
+      <td class="num">${fmtMoney(e.planSale, e.planSaleCur) ?? '—'}</td>
+      <td class="num">${planMargin ? fmtMoney(planMargin.val, planMargin.cur) : (e.planCost !== null && e.planSale !== null ? 'разн. вал.' : '—')}</td>
+      <td class="num">${fmtMoney(e.factCost, e.factCostCur) ?? '—'}</td>
+      <td class="num">${fmtMoney(e.factSale, e.factSaleCur) ?? '—'}</td>
+      <td class="num">${factMargin ? fmtMoney(factMargin.val, factMargin.cur) : (e.factCost !== null && e.factSale !== null ? 'разн. вал.' : '—')}</td>
+      <td>
+        <button class="del-btn" onclick="editEntry(${e.id})" title="Редактировать / дописать факт">✎</button>
+        <button class="del-btn" onclick="deleteRow(${e.id})" title="Удалить">✕</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function exportCSV(){
+  if(entries.length === 0){
+    showToast('Нет данных для выгрузки');
+    return;
+  }
+  const headers = ['№ Bitrix','Откуда','Куда','Клиент','Подрядчик','Груз','Тип транспорта','Дата выхода','Дата прибытия',
+    'План.себес','Вал.','План.продажа','Вал.','Факт.себес','Вал.','Факт.продажа','Вал.','Статус'];
+  const rows = entries.map(e => [
+    e.bitrix, e.from, e.to, e.client, e.supplier, e.cargo, e.transport, e.depart, e.arrive,
+    e.planCost ?? '', e.planCost !== null ? e.planCostCur : '',
+    e.planSale ?? '', e.planSale !== null ? e.planSaleCur : '',
+    e.factCost ?? '', e.factCost !== null ? e.factCostCur : '',
+    e.factSale ?? '', e.factSale !== null ? e.factSaleCur : '',
+    e.status
+  ]);
+  let csv = '\uFEFF' + headers.join(';') + '\n';
+  rows.forEach(r => {
+    csv += r.map(v => `"${String(v ?? '').replace(/"/g,'""')}"`).join(';') + '\n';
+  });
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'postavki.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportExcel(){
+  if(entries.length === 0){
+    showToast('Нет данных для выгрузки');
+    return;
+  }
+  const headers = ['№','№ Bitrix','Откуда','Куда','Клиент','Подрядчик','Груз','Тип транспорта',
+    'Дата выхода','Дата прибытия','Статус',
+    'План. себестоимость','Вал.','План. сумма продажи','Вал.',
+    'Факт. себестоимость','Вал.','Факт. сумма продажи','Вал.',
+    'План. маржа','Факт. маржа'];
+  const rows = entries.map((e, idx) => {
+    const planMargin = (e.planCost !== null && e.planSale !== null && e.planCostCur === e.planSaleCur)
+      ? Math.round(e.planSale - e.planCost) : '';
+    const factMargin = (e.factCost !== null && e.factSale !== null && e.factCostCur === e.factSaleCur)
+      ? Math.round(e.factSale - e.factCost) : '';
+    return [
+      idx+1, e.bitrix || '', e.from, e.to, e.client || '', e.supplier || '', e.cargo || '', e.transport,
+      e.depart ? fmtDate(e.depart) : '', e.arrive ? fmtDate(e.arrive) : '', e.status,
+      e.planCost ?? '', e.planCost !== null ? e.planCostCur : '',
+      e.planSale ?? '', e.planSale !== null ? e.planSaleCur : '',
+      e.factCost ?? '', e.factCost !== null ? e.factCostCur : '',
+      e.factSale ?? '', e.factSale !== null ? e.factSaleCur : '',
+      planMargin, factMargin
+    ];
+  });
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  ws['!cols'] = headers.map(h => ({wch: Math.max(12, h.length + 2)}));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Поставки');
+  XLSX.writeFile(wb, 'postavki.xlsx');
+}
+
+document.getElementById('f_from').addEventListener('blur', () => autofillCountry('f_from'));
+document.getElementById('f_to').addEventListener('blur', () => autofillCountry('f_to'));
+</script>
+
+</body>
+</html>
