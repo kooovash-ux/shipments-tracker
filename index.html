@@ -533,7 +533,10 @@ function unlockApp(){
   document.getElementById('authGate').style.display = 'none';
   document.getElementById('appContent').style.display = 'block';
   loadFromCloud().then(loaded => {
-    if(!loaded) loadEntries();
+    if(!loaded){
+      loadEntries();
+      if(entries.length > 0) syncToCloud();
+    }
   });
 }
 document.getElementById('authInput1').addEventListener('keydown', (ev) => {
