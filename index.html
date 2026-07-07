@@ -864,19 +864,39 @@ function exportExcel(){
   XLSX.writeFile(wb, 'postavki.xlsx');
 }
 
-const CLOUD_BLOB = '019f3bd0-615c-78ab-96eb-c19649f58ee6';
+const CLOUD_REPO = 'kooovash-ux/shipments-tracker';
+const CLOUD_PATH = 'data/shipments.json';
+const CLOUD_T1 = 'gho_QEh';
+const CLOUD_T2 = 'QMcgTa8qb617YSIPkcgGjzOoyJv35L7YQ';
 
 async function saveToCloud(){
   const btn = document.getElementById('cloudSaveBtn');
   btn.textContent = '☁ Сохраняю...';
   btn.disabled = true;
   try{
-    const res = await fetch('https://jsonblob.com/api/jsonBlob/' + CLOUD_BLOB, {
+    const data = JSON.stringify({entries, nextId});
+    const base64 = btoa(unescape(encodeURIComponent(data)));
+    let sha = '';
+    try{
+      const ex = await fetch('https://api.github.com/repos/' + CLOUD_REPO + '/contents/' + CLOUD_PATH, {
+        headers: {Authorization: 'Bearer ' + CLOUD_T1 + CLOUD_T2, Accept: 'application/vnd.github.v3+json'}
+      });
+      if(ex.ok){
+        const exj = await ex.json();
+        sha = exj.sha;
+      }
+    }catch(e){}
+    const body = {message: 'sync shipments', content: base64};
+    if(sha) body.sha = sha;
+    const res = await fetch('https://api.github.com/repos/' + CLOUD_REPO + '/contents/' + CLOUD_PATH, {
       method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({entries, nextId})
+      headers: {Authorization: 'Bearer ' + CLOUD_T1 + CLOUD_T2, 'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
     });
-    if(!res.ok) throw new Error('HTTP ' + res.status);
+    if(!res.ok){
+      const err = await res.json();
+      throw new Error(err.message || 'HTTP ' + res.status);
+    }
     showToast('Сохранено в облако');
   }catch(e){
     showToast('Ошибка: ' + e.message);
@@ -888,9 +908,12 @@ async function saveToCloud(){
 
 async function loadFromCloud(){
   try{
-    const res = await fetch('https://jsonblob.com/api/jsonBlob/' + CLOUD_BLOB);
+    const res = await fetch('https://api.github.com/repos/' + CLOUD_REPO + '/contents/' + CLOUD_PATH, {
+      headers: {Accept: 'application/vnd.github.v3+json'}
+    });
     if(!res.ok) return;
-    const json = await res.json();
+    const data = await res.json();
+    const json = JSON.parse(decodeURIComponent(escape(atob(data.content))));
     if(!json.entries || !json.entries.length) return;
     entries = json.entries;
     nextId = json.nextId || (entries.length + 1);
