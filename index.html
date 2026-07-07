@@ -464,9 +464,11 @@
 <div class="card">
   <div class="toolbar">
     <h2 style="margin:0;">Таблица поставок</h2>
-    <div style="display:flex; gap:10px;">
-      <button class="btn-ghost" onclick="exportCSV()">Скачать CSV</button>
-      <button class="btn-primary" onclick="exportExcel()">Скачать Excel</button>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn-ghost" onclick="exportCSV()">CSV</button>
+      <button class="btn-primary" onclick="exportExcel()">Excel</button>
+      <button class="btn-ghost" id="cloudSaveBtn" onclick="saveToCloud()" style="border-color:var(--green);color:var(--green);">☁ Сохранить</button>
+      <button class="btn-ghost" onclick="loadFromCloud()" style="border-color:#5a7c99;color:#5a7c99;">☁ Загрузить</button>
     </div>
   </div>
   <div class="table-wrap">
@@ -860,6 +862,98 @@ function exportExcel(){
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Поставки');
   XLSX.writeFile(wb, 'postavki.xlsx');
+}
+
+const CLOUD_REPO = 'kooovash-ux/shipments-tracker';
+const CLOUD_PATH = 'data/shipments.json';
+
+function getCloudToken(){
+  return localStorage.getItem('cloud_gh_token') || '';
+}
+
+function setCloudToken(token){
+  localStorage.setItem('cloud_gh_token', token);
+}
+
+async function saveToCloud(){
+  const token = getCloudToken();
+  if(!token){
+    const t = prompt('Введите GitHub Personal Access Token (repo):\n\nСоздать: github.com/settings/tokens/new');
+    if(!t) return;
+    setCloudToken(t);
+  }
+  const btn = document.getElementById('cloudSaveBtn');
+  btn.textContent = '☁ Сохраняю...';
+  btn.disabled = true;
+  try{
+    const data = JSON.stringify({entries, nextId});
+    const base64 = btoa(unescape(encodeURIComponent(data)));
+    let sha = '';
+    try{
+      const existing = await fetch(`https://api.github.com/repos/${CLOUD_REPO}/contents/${CLOUD_PATH}`, {
+        headers: {Authorization: 'Bearer ' + getCloudToken(), Accept: 'application/vnd.github.v3+json'}
+      });
+      if(existing.ok){
+        const ex = await existing.json();
+        sha = ex.sha;
+      }
+    }catch(e){}
+    const body = {message: 'sync shipments', content: base64};
+    if(sha) body.sha = sha;
+    const res = await fetch(`https://api.github.com/repos/${CLOUD_REPO}/contents/${CLOUD_PATH}`, {
+      method: 'PUT',
+      headers: {Authorization: 'Bearer ' + getCloudToken(), 'Content-Type': 'application/json', Accept: 'application/vnd.github.v3+json'},
+      body: JSON.stringify(body)
+    });
+    if(!res.ok){
+      const err = await res.json();
+      throw new Error(err.message || 'HTTP ' + res.status);
+    }
+    showToast('Сохранено в облако');
+  }catch(e){
+    showToast('Ошибка: ' + e.message);
+    if(e.message.includes('Bad credentials') || e.message.includes('401')){
+      localStorage.removeItem('cloud_gh_token');
+      showToast('Токен недействителен — введите новый');
+    }
+  }finally{
+    btn.textContent = '☁ Сохранить';
+    btn.disabled = false;
+  }
+}
+
+async function loadFromCloud(){
+  try{
+    const res = await fetch(`https://api.github.com/repos/${CLOUD_REPO}/contents/${CLOUD_PATH}`, {
+      headers: {Accept: 'application/vnd.github.v3+json'}
+    });
+    if(res.status === 404){
+      showToast('В облаке пока нет данных');
+      return;
+    }
+    if(!res.ok){
+      showToast('Ошибка загрузки: ' + res.status);
+      return;
+    }
+    const data = await res.json();
+    const json = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+    if(!json.entries || !json.entries.length){
+      showToast('В облаке пусто');
+      return;
+    }
+    if(entries.length > 0){
+      if(!confirm('Текущие данные (' + entries.length + ' записей) будут заменены облачными (' + json.entries.length + '). Продолжить?')) return;
+    }
+    entries = json.entries;
+    nextId = json.nextId || (entries.length + 1);
+    editingId = null;
+    clearForm();
+    saveEntries();
+    render();
+    showToast('Загружено ' + entries.length + ' записей из облака');
+  }catch(e){
+    showToast('Ошибка загрузки: ' + e.message);
+  }
 }
 
 document.getElementById('f_from').addEventListener('blur', () => autofillCountry('f_from'));
