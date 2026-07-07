@@ -513,11 +513,16 @@ const storageAPI = {
   }
 };
 
-const APP_PASSWORD = '9761';
+const APP_PASSWORD_HASH = 'aece8aa742ae952451fb745564f60f5f5d6fa6ef09bd4721d6b286be4124eb1f';
 
-function checkPassword(){
+async function sha256(str){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function checkPassword(){
   const p1 = document.getElementById('authInput1').value;
-  if(p1 === APP_PASSWORD){
+  if(await sha256(p1) === APP_PASSWORD_HASH){
     unlockApp();
   } else {
     document.getElementById('authError').style.display = 'block';
