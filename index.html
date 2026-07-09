@@ -1029,12 +1029,35 @@ async function loadCbrRates(){
       }
     }
   }catch(e){
-    // ignore — fall through to the direct external attempt below
+    // ignore — fall through
   }
 
-  // 2) Fallback: direct fetch from the mirror. Works in some hosting setups,
-  //    but many browsers block it via CORS (no Access-Control-Allow-Origin
-  //    header on that endpoint) — that's expected, not a bug in this app.
+  // 2) CORS-friendly currency API on jsdelivr CDN (access-control-allow-origin: *)
+  try{
+    const res = await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/rub.json');
+    if(res.ok){
+      const data = await res.json();
+      const rub = data.rub;
+      if(rub && rub.usd){
+        const rates = {RUB: 1};
+        // API gives "1 RUB = X foreign" — invert to get "1 foreign = X RUB"
+        if(rub.usd) rates.USD = 1 / rub.usd;
+        if(rub.eur) rates.EUR = 1 / rub.eur;
+        if(rub.cny) rates.CNY = 1 / rub.cny;
+        if(rub.inr) rates.INR = 1 / rub.inr;
+        cbrRates = rates;
+        cbrDate = data.date || '';
+        cbrStatus = 'ok';
+        render();
+        return;
+      }
+    }
+  }catch(e){
+    // ignore — fall through to direct CBR API
+  }
+
+  // 3) Fallback: direct fetch from the CBR mirror. Works in some hosting,
+  //    but CORS may block it — that's expected.
   try{
     const res = await fetch('https://www.cbr-xml-daily.ru/daily_json.js');
     const data = await res.json();
