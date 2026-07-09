@@ -139,7 +139,7 @@
   table{
     border-collapse:collapse;
     width:100%;
-    min-width:1200px;
+    min-width:640px;
     font-size:12.5px;
   }
   thead th{
@@ -229,6 +229,454 @@
   }
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
   .hint{font-size:11.5px; color:var(--text-dim); margin-top:2px;}
+
+  .checkbox-field{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:10px 12px;
+    font-size:13px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .checkbox-field input[type="checkbox"]{
+    width:16px;
+    height:16px;
+    accent-color:var(--green);
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .pay-icon{font-size:14px;}
+  tr.row-alert{background:rgba(214,67,60,0.06);}
+  tr.row-alert:hover{background:rgba(214,67,60,0.1);}
+  td.cell-alert{
+    background:rgba(214,67,60,0.14);
+    color:var(--red);
+    font-weight:700;
+    border-radius:4px;
+  }
+
+  .cost-card{
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px 14px;
+    margin-bottom:10px;
+    background:var(--panel-2);
+  }
+  .cost-card-top{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:10px;
+    flex-wrap:wrap;
+  }
+  .cost-card-toggle{
+    background:transparent;
+    border:1px solid var(--border);
+    border-radius:6px;
+    color:var(--text-dim);
+    font-family:var(--mono);
+    font-size:12px;
+    width:28px;
+    height:28px;
+    flex:0 0 auto;
+    cursor:pointer;
+  }
+  .cost-card-toggle:hover{border-color:var(--green); color:var(--green-dark);}
+  .cost-card-summary{
+    font-size:12px;
+    color:var(--text-dim);
+    white-space:nowrap;
+  }
+  .cost-card-dup{
+    font-size:14px;
+  }
+  .cost-timeline{
+    display:flex;
+    align-items:flex-start;
+    gap:0;
+    overflow-x:auto;
+    padding:14px 4px 18px;
+    margin-bottom:8px;
+  }
+  .timeline-stage{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-width:130px;
+    text-align:center;
+    flex-shrink:0;
+  }
+  .timeline-dot{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:var(--green);
+    margin-bottom:8px;
+  }
+  .timeline-stage-label{
+    font-size:12px;
+    color:var(--text);
+    line-height:1.4;
+  }
+  .timeline-connector{
+    flex:1;
+    height:2px;
+    background:var(--border);
+    margin-top:6px;
+    min-width:24px;
+  }
+  .cost-card-top select.cost-type{
+    background:var(--panel);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:8px;
+    padding:8px 10px;
+    font-size:13px;
+    font-family:inherit;
+    flex:0 0 auto;
+    min-width:170px;
+  }
+  .cost-card-top input[type="text"].cost-type-custom{
+    background:var(--panel);
+    border:1px solid var(--green);
+    color:var(--text);
+    border-radius:8px;
+    padding:8px 10px;
+    font-size:13px;
+    font-family:inherit;
+    flex:1;
+    min-width:140px;
+  }
+  .cost-card-top input[type="text"].cost-name{
+    flex:1;
+    min-width:140px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:8px;
+    padding:8px 10px;
+    font-size:13px;
+    font-family:inherit;
+  }
+  .cost-card-route{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin-bottom:8px;
+  }
+  .cost-card-route input{
+    background:var(--panel);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:8px;
+    padding:7px 9px;
+    font-size:12.5px;
+    font-family:inherit;
+    width:100%;
+  }
+  .cost-card-amounts{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .cost-card-amounts label{
+    font-size:11px;
+    color:var(--text-dim);
+    display:block;
+    margin-bottom:4px;
+  }
+  .cost-card-triple{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:8px;
+    margin-bottom:10px;
+  }
+  .cost-card-triple select, .cost-card-triple input{
+    background:var(--panel);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:8px;
+    padding:7px 9px;
+    font-size:12.5px;
+    font-family:inherit;
+    width:100%;
+  }
+  .cost-compare-table{
+    display:grid;
+    grid-template-columns:56px 1fr 1fr;
+    gap:6px 10px;
+    align-items:center;
+    margin-bottom:10px;
+  }
+  .cost-compare-table.combined{
+    grid-template-columns:56px 1fr;
+  }
+  .cost-compare-table .col-head{
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    color:var(--text-dim);
+    font-weight:600;
+  }
+  .cost-compare-table .row-head{
+    font-size:12px;
+    color:var(--text-dim);
+  }
+  .cost-compare-table select.cost-vat,
+  .cost-compare-table select.cost-sale-vat{
+    background:var(--panel);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:8px;
+    padding:7px 9px;
+    font-size:12.5px;
+    font-family:inherit;
+    width:100%;
+  }
+  .wizard-progress{
+    display:flex;
+    gap:6px;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+  }
+  .wizard-pill{
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    color:var(--text-dim);
+    font-size:12.5px;
+    font-family:inherit;
+    padding:7px 14px;
+    border-radius:20px;
+    cursor:pointer;
+  }
+  .wizard-pill.active{
+    background:var(--green);
+    border-color:var(--green);
+    color:#fff;
+    font-weight:600;
+  }
+  .wizard-pill.done{
+    color:var(--green-dark);
+    border-color:var(--green);
+  }
+  .payment-checklist-section{
+    margin-top:14px;
+    padding-top:14px;
+    border-top:1px dashed var(--border);
+  }
+  .payment-check-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    flex-wrap:wrap;
+    background:rgba(33,160,56,0.05);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:9px 12px;
+    margin-bottom:6px;
+  }
+  .payment-check-label{
+    font-size:12.5px;
+    flex:1;
+    min-width:140px;
+  }
+  .payment-check-row .checkbox-field{
+    background:transparent;
+    border:none;
+    padding:0;
+    flex:0 0 auto;
+  }
+  .live-summary-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(16,36,58,0.35);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:80;
+    padding:20px;
+  }
+  .live-summary{
+    width:300px;
+    max-width:100%;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:18px;
+    box-shadow:0 12px 36px rgba(16,36,58,0.22);
+  }
+  .live-summary-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+  }
+  .live-summary-tabs{
+    display:flex;
+    gap:4px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:3px;
+  }
+  .live-tab{
+    background:transparent;
+    border:none;
+    color:var(--text-dim);
+    font-size:12px;
+    padding:6px 10px;
+    border-radius:6px;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .live-tab.active{
+    background:var(--green);
+    color:#fff;
+  }
+  .live-summary-close{
+    background:transparent;
+    border:none;
+    color:var(--text-dim);
+    font-size:16px;
+    cursor:pointer;
+    padding:2px 6px;
+    line-height:1;
+  }
+  .live-summary-close:hover{color:var(--red);}
+  .live-summary-label{
+    font-size:11.5px;
+    color:var(--text-dim);
+    margin-bottom:12px;
+  }
+  .live-summary-row{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    font-size:12.5px;
+    margin-bottom:8px;
+  }
+  .live-summary-row span:first-child{color:var(--text-dim);}
+  .live-summary-row span:last-child{font-weight:600; text-align:right; font-family:var(--mono);}
+  .live-summary-divider{
+    border-top:1px solid var(--border);
+    margin:10px 0;
+  }
+  .live-summary-margin-label{
+    font-size:11.5px;
+    color:var(--text-dim);
+    margin-bottom:4px;
+  }
+  .live-summary-margin{
+    font-size:20px;
+    font-weight:700;
+    font-family:var(--mono);
+  }
+  .stats-row{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+    gap:12px;
+    margin-bottom:20px;
+  }
+  .stat-card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px 18px;
+    box-shadow:0 1px 3px rgba(16,36,58,0.04);
+  }
+  .stat-label{
+    font-size:12.5px;
+    color:var(--text-dim);
+    margin-bottom:6px;
+  }
+  .stat-value{
+    font-size:24px;
+    font-weight:700;
+    color:var(--text);
+  }
+  .stat-value.stat-danger{color:var(--red);}
+  .badge-mini{
+    display:inline-block;
+    font-size:11px;
+    font-family:var(--mono);
+    padding:2px 8px;
+    border-radius:10px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    color:var(--text-dim);
+  }
+  .badge-mini.pos{background:rgba(33,160,56,0.12); color:var(--green-dark); border-color:transparent;}
+  .badge-mini.neg{background:rgba(214,67,60,0.12); color:var(--red); border-color:transparent;}
+  .type-badge{
+    font-size:10px;
+    background:rgba(33,160,56,0.15);
+    color:var(--green-dark);
+    padding:2px 7px;
+    border-radius:10px;
+    white-space:nowrap;
+  }
+  .cost-card-divider{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--text-dim);
+    font-weight:600;
+    margin:12px 0 8px;
+    padding-top:10px;
+    border-top:1px dashed var(--border);
+  }
+  .cost-row-empty{
+    color:var(--text-dim);
+    font-size:12.5px;
+    padding:6px 0;
+  }
+  .expand-toggle{
+    background:transparent;
+    border:1px solid var(--border);
+    border-radius:6px;
+    color:var(--text);
+    font-family:var(--mono);
+    font-size:12px;
+    padding:3px 8px;
+    cursor:pointer;
+  }
+  .expand-toggle:hover{border-color:var(--green); color:var(--green-dark);}
+  tr.expand-row td{
+    background:var(--panel-2);
+    padding:12px 16px;
+    font-family:'Inter', sans-serif;
+  }
+  .expand-cost-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12px;
+  }
+  .expand-cost-table th{
+    text-align:left;
+    font-weight:600;
+    color:var(--text-dim);
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    padding:4px 10px 6px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .expand-cost-table td{
+    padding:6px 10px 6px 0;
+    font-family:var(--mono);
+    border-bottom:1px solid var(--border);
+  }
+  .expand-cost-table tr:last-child td{border-bottom:none;}
+  .expand-subtotal{
+    margin-top:8px;
+    font-size:11.5px;
+    color:var(--text-dim);
+  }
 
   .auth-gate{
     position:fixed;
@@ -331,6 +779,9 @@
 </head>
 <body>
 
+<datalist id="clientNamesList"></datalist>
+<datalist id="contractorNamesList"></datalist>
+
 <div id="authGate" class="auth-gate">
   <div class="auth-box">
     <h2 style="margin:0 0 6px; font-size:16px;">Вход</h2>
@@ -354,6 +805,14 @@
     </div>
   </div>
   <div id="entryFormPanel" style="display:none;">
+  <div class="hint" style="margin-bottom:14px;">Обязательны только поля со <span style="color:var(--red);">*</span> — всё остальное можно оставить пустым и дозаполнить позже.</div>
+
+  <div class="wizard-progress" id="wizardProgress">
+    <button type="button" class="wizard-pill" data-step="1" onclick="goToStep(1)">1. Маршрут и груз</button>
+    <button type="button" class="wizard-pill" data-step="2" onclick="goToStep(2)">2. Подрядчики</button>
+  </div>
+
+  <div class="wizard-step" data-step="1">
   <div class="form-section">
     <div class="section-title">
       <div class="section-num">1</div>
@@ -362,27 +821,18 @@
     </div>
     <div class="grid-section">
       <div class="field"><label>№ Битрикс</label><input type="text" id="f_bitrix" placeholder="напр. 1893"></div>
-      <div class="field"><label>Откуда</label><input type="text" id="f_from" placeholder="Шанхай"><span class="hint">впишите город — страна подставится сама</span></div>
-      <div class="field"><label>Куда</label><input type="text" id="f_to" placeholder="Санкт-Петербург"><span class="hint">впишите город — страна подставится сама</span></div>
-      <div class="field"><label>Клиент</label><input type="text" id="f_client" placeholder="Название клиента"></div>
-      <div class="field"><label>Подрядчик</label><input type="text" id="f_supplier" placeholder="Название подрядчика"></div>
+      <div class="field"><label>Откуда <span style="color:var(--red);">*</span></label><input type="text" id="f_from" placeholder="Шанхай"><span class="hint">впишите город — страна подставится сама</span></div>
+      <div class="field"><label>Куда <span style="color:var(--red);">*</span></label><input type="text" id="f_to" placeholder="Санкт-Петербург"><span class="hint">впишите город — страна подставится сама</span></div>
     </div>
-  </div>
-
-  <div class="form-section">
-    <div class="section-title">
-      <div class="section-num">2</div>
-      <h3>Груз и доставка</h3>
-      <span class="section-sub">что везём и каким способом</span>
+    <div class="cost-card-divider">Клиент</div>
+    <div class="grid-section">
+      <div class="field"><label>Клиент</label><input type="text" id="f_client" placeholder="Название клиента" list="clientNamesList"></div>
+      <div class="field"><label>Почта клиента</label><input type="email" id="f_client_email" placeholder="client@example.com"></div>
+      <div class="field"><label>Телефон / телеграм клиента</label><input type="text" id="f_client_contact" placeholder="+7 900 000-00-00 или @username"></div>
     </div>
+    <div class="cost-card-divider">Груз и доставка</div>
     <div class="grid-section">
       <div class="field"><label>Груз</label><input type="text" id="f_cargo" placeholder="Что за груз"></div>
-      <div class="field">
-        <label>Тип транспорта</label>
-        <select id="f_transport">
-          <option>FCL</option><option>LCL</option><option>AIR</option><option>FTL</option><option>LTL</option>
-        </select>
-      </div>
       <div class="field">
         <label>Статус</label>
         <select id="f_status">
@@ -392,80 +842,129 @@
       </div>
     </div>
   </div>
-
-  <div class="form-section">
-    <div class="section-title">
-      <div class="section-num">3</div>
-      <h3>Даты</h3>
-      <span class="section-sub">выход и прибытие груза</span>
-    </div>
-    <div class="grid-section">
-      <div class="field"><label>Дата выхода груза</label><input type="date" id="f_depart"></div>
-      <div class="field"><label>Дата прибытия</label><input type="date" id="f_arrive"></div>
-    </div>
+  <div class="row-actions" style="justify-content:flex-end;">
+    <button class="btn-primary" type="button" onclick="goToStep(2)">Далее →</button>
+  </div>
   </div>
 
+  <div class="wizard-step" data-step="2">
   <div class="form-section">
     <div class="section-title">
-      <div class="section-num">4</div>
-      <h3>Деньги</h3>
-      <span class="section-sub">валюта, план и факт</span>
+      <div class="section-num">2</div>
+      <h3>Подрядчики, счета клиенту и оплаты</h3>
+      <span class="section-sub">по карточке на каждый счёт: себестоимость, сумма для клиента, кто оплатил</span>
     </div>
-    <div class="grid-section">
-      <div class="field">
-        <label>План. себестоимость</label>
-        <div class="amount-group">
-          <input type="number" id="f_plan_cost" step="0.01">
-          <select id="f_plan_cost_cur">
-            <option value="USD">USD</option><option value="CNY">CNY</option><option value="INR">INR</option>
-            <option value="RUB">RUB</option><option value="EUR">EUR</option>
-          </select>
+    <div id="costTimeline" style="display:none;"></div>
+    <div id="costRows"></div>
+    <div style="display:flex; gap:10px; margin:10px 0 18px;">
+      <button class="btn-ghost" type="button" onclick="addCostRow()">+ Добавить подрядчика</button>
+    </div>
+    <label class="checkbox-field" style="margin-bottom:12px;">
+      <input type="checkbox" id="f_combined_sale" onchange="toggleCombinedSale()">
+      <span>Клиенту выставляем одну сумму за всю поставку целиком, а не по каждому подрядчику — редкий случай</span>
+    </label>
+    <div id="combinedSalePanel" class="cost-card" style="display:none; margin-bottom:14px;">
+      <div class="cost-card-amounts">
+        <div>
+          <label>План — сумма клиенту за всю поставку</label>
+          <div class="amount-group">
+            <input type="number" id="f_combined_plan_sale" step="0.01">
+            <select id="f_combined_plan_sale_cur">
+              <option value="USD">USD</option><option value="CNY">CNY</option><option value="INR">INR</option>
+              <option value="RUB">RUB</option><option value="EUR">EUR</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label>Факт — сумма клиенту за всю поставку</label>
+          <div class="amount-group">
+            <input type="number" id="f_combined_fact_sale" step="0.01">
+            <select id="f_combined_fact_sale_cur">
+              <option value="USD">USD</option><option value="CNY">CNY</option><option value="INR">INR</option>
+              <option value="RUB">RUB</option><option value="EUR">EUR</option>
+            </select>
+          </div>
         </div>
       </div>
-      <div class="field">
-        <label>План. сумма продажи</label>
-        <div class="amount-group">
-          <input type="number" id="f_plan_sale" step="0.01">
-          <select id="f_plan_sale_cur">
-            <option value="USD">USD</option><option value="CNY">CNY</option><option value="INR">INR</option>
-            <option value="RUB">RUB</option><option value="EUR">EUR</option>
-          </select>
-        </div>
+      <div class="field" style="margin-bottom:10px;">
+        <label style="font-size:11px; color:var(--text-dim); display:block; margin-bottom:4px;">НДС на эту сумму</label>
+        <select id="f_combined_vat" style="max-width:160px;">
+          <option value="0">0%</option>
+          <option value="5">5%</option>
+          <option value="7">7%</option>
+          <option value="10">10%</option>
+          <option value="20">20%</option>
+          <option value="22">22%</option>
+        </select>
       </div>
-      <div class="field">
-        <label>Факт. себестоимость</label>
-        <div class="amount-group">
-          <input type="number" id="f_fact_cost" step="0.01">
-          <select id="f_fact_cost_cur">
-            <option value="USD">USD</option><option value="CNY">CNY</option><option value="INR">INR</option>
-            <option value="RUB">RUB</option><option value="EUR">EUR</option>
-          </select>
-        </div>
-      </div>
-      <div class="field">
-        <label>Факт. сумма продажи</label>
-        <div class="amount-group">
-          <input type="number" id="f_fact_sale" step="0.01">
-          <select id="f_fact_sale_cur">
-            <option value="USD">USD</option><option value="CNY">CNY</option><option value="INR">INR</option>
-            <option value="RUB">RUB</option><option value="EUR">EUR</option>
-          </select>
-        </div>
-      </div>
+      <label class="checkbox-field" style="margin-top:8px;">
+        <input type="checkbox" id="f_combined_received">
+        <span>Деньги от клиента за поставку получены</span>
+      </label>
+    </div>
+    <div class="payment-checklist-section">
+      <div class="live-summary-label" style="margin-bottom:8px;">Оплаты — все подрядчики сразу</div>
+      <div id="paymentChecklist"></div>
     </div>
   </div>
   <div class="row-actions">
+    <button class="btn-ghost" type="button" onclick="goToStep(1)" style="margin-right:auto;">← Назад</button>
     <button class="btn-ghost" onclick="clearForm()">Очистить / новая заявка</button>
     <button class="btn-primary" id="submitBtn" onclick="addRow()">Добавить в таблицу</button>
   </div>
+  </div>
+
+  </div>
+</div>
+
+<div class="live-summary-overlay" id="liveSummaryOverlay" onclick="if(event.target===this) closeLiveSummary()">
+  <div class="live-summary" id="liveSummary">
+    <div class="live-summary-header">
+      <div class="live-summary-tabs">
+        <button class="live-tab active" id="tabEntryBtn" type="button" onclick="switchSummaryTab('entry')">Эта поставка</button>
+        <button class="live-tab" id="tabAllBtn" type="button" onclick="switchSummaryTab('all')">Все поставки</button>
+      </div>
+      <button class="live-summary-close" type="button" onclick="closeLiveSummary()" title="Закрыть">✕</button>
+    </div>
+    <div id="summaryEntryView">
+      <div class="live-summary-row"><span>Подрядчиков</span><span id="liveCount">0</span></div>
+      <div class="live-summary-row"><span>Себестоимость</span><span id="liveCost">—</span></div>
+      <div class="live-summary-row"><span>Предложение клиенту</span><span id="liveSale">—</span></div>
+      <div class="live-summary-divider"></div>
+      <div class="live-summary-margin-label">Маржа (факт), ₽</div>
+      <div class="live-summary-margin" id="liveMargin">—</div>
+    </div>
+    <div id="summaryAllView" style="display:none;">
+      <div class="live-summary-row"><span>Активных поставок</span><span id="allActive">—</span></div>
+      <div class="live-summary-row"><span>Ждут оплаты подрядчику</span><span id="allPending">—</span></div>
+      <div class="live-summary-divider"></div>
+      <div class="live-summary-margin-label">Общая маржа (факт), ₽</div>
+      <div class="live-summary-margin" id="allMargin">—</div>
+    </div>
+  </div>
+</div>
+
+<div class="stats-row" id="statsRow">
+  <div class="stat-card">
+    <div class="stat-label">Активных поставок</div>
+    <div class="stat-value" id="statActive">—</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Ждут оплаты подрядчику</div>
+    <div class="stat-value stat-danger" id="statPending">—</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Общая маржа (факт), ₽</div>
+    <div class="stat-value" id="statMargin">—</div>
   </div>
 </div>
 
 <div class="card">
   <div class="toolbar">
     <h2 style="margin:0;">Таблица поставок</h2>
-    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-      <button class="btn-ghost" onclick="exportCSV()">CSV</button>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+      <span id="cbrRateNote" class="hint" style="margin:0;"></span>
+      <button class="btn-primary" id="cbrRefreshBtn" onclick="refreshCbrRates()">Рассчитать маржинальность</button>
       <button class="btn-primary" onclick="exportExcel()">Excel</button>
     </div>
   </div>
@@ -473,10 +972,12 @@
     <table id="dataTable">
       <thead>
         <tr>
-          <th>№</th><th>№ Bitrix</th><th>Откуда</th><th>Куда</th><th>Клиент</th><th>Подрядчик</th><th>Груз</th>
-          <th>Тип</th><th>Выход</th><th>Прибытие</th><th>Статус</th>
-          <th class="num">План. себес</th><th class="num">План. продажа</th><th class="num">План. маржа</th>
-          <th class="num">Факт. себес</th><th class="num">Факт. продажа</th><th class="num">Факт. маржа</th>
+          <th style="width:36px;">№</th>
+          <th>Заявка</th>
+          <th>Статус</th>
+          <th>Даты</th>
+          <th class="num">Маржа, ₽</th>
+          <th>Оплаты</th>
           <th></th>
         </tr>
       </thead>
@@ -494,6 +995,91 @@
 let entries = [];
 let nextId = 1;
 let editingId = null;
+
+let cbrRates = {RUB: 1};
+let cbrDate = '';
+let cbrStatus = 'idle';
+
+async function refreshCbrRates(){
+  const btn = document.getElementById('cbrRefreshBtn');
+  const prevText = btn.textContent;
+  btn.textContent = 'Обновляю...';
+  btn.disabled = true;
+  cbrStatus = 'loading';
+  render();
+  await loadCbrRates();
+  btn.textContent = prevText;
+  btn.disabled = false;
+  showToast(cbrStatus === 'ok' ? `Курс ЦБ обновлён (на ${cbrDate})` : 'Не удалось получить курс ЦБ');
+}
+
+async function loadCbrRates(){
+  // 1) Prefer our own cbr-rates.json in the same repo/origin — no CORS issue,
+  //    kept fresh by the daily GitHub Action (.github/workflows/update-cbr-rates.yml).
+  try{
+    const res = await fetch('./cbr-rates.json', {cache: 'no-store'});
+    if(res.ok){
+      const data = await res.json();
+      if(data && data.rates){
+        cbrRates = data.rates;
+        cbrDate = data.date ? data.date.slice(0,10).split('-').reverse().join('.') : '';
+        cbrStatus = 'ok';
+        render();
+        return;
+      }
+    }
+  }catch(e){
+    // ignore — fall through to the direct external attempt below
+  }
+
+  // 2) Fallback: direct fetch from the mirror. Works in some hosting setups,
+  //    but many browsers block it via CORS (no Access-Control-Allow-Origin
+  //    header on that endpoint) — that's expected, not a bug in this app.
+  try{
+    const res = await fetch('https://www.cbr-xml-daily.ru/daily_json.js');
+    const data = await res.json();
+    const rates = {RUB: 1};
+    ['USD','EUR','CNY','INR'].forEach(code => {
+      const v = data.Valute && data.Valute[code];
+      if(v) rates[code] = v.Value / v.Nominal;
+    });
+    cbrRates = rates;
+    cbrDate = data.Date ? data.Date.slice(0,10).split('-').reverse().join('.') : '';
+    cbrStatus = 'ok';
+  }catch(e){
+    cbrStatus = 'error';
+  }
+  render();
+}
+
+function toRub(amount, cur){
+  if(amount === null || amount === undefined) return 0;
+  const rate = cbrRates[cur];
+  if(rate === undefined) return null;
+  return amount * rate;
+}
+
+function netRub(amount, cur, vatPercent){
+  if(amount === null || amount === undefined) return 0;
+  const rub = toRub(amount, cur);
+  if(rub === null) return null;
+  const v = vatPercent || 0;
+  return rub / (1 + v / 100);
+}
+
+// Fact amounts are the settled, real-money figure — by the time you know the fact,
+// you already know what it cost in rubles (whatever rate applied when it actually
+// happened). Re-converting facts at today's CBR rate would be wrong, so facts skip
+// currency conversion entirely and only get the VAT stripped out.
+function netFact(amount, vatPercent){
+  if(amount === null || amount === undefined) return 0;
+  const v = vatPercent || 0;
+  return amount / (1 + v / 100);
+}
+
+function noCbrText(){
+  return cbrStatus === 'idle' ? 'не рассчитано' : 'нет курса';
+}
 
 const storageAPI = {
   async get(key, shared){
@@ -532,12 +1118,7 @@ async function checkPassword(){
 function unlockApp(){
   document.getElementById('authGate').style.display = 'none';
   document.getElementById('appContent').style.display = 'block';
-  loadFromCloud().then(loaded => {
-    if(!loaded){
-      loadEntries();
-      if(entries.length > 0) syncToCloud();
-    }
-  });
+  loadEntries();
 }
 document.getElementById('authInput1').addEventListener('keydown', (ev) => {
   if(ev.key === 'Enter') checkPassword();
@@ -578,12 +1159,15 @@ const CITY_COUNTRY = {
   'коломбо':'Шри-Ланка','карачи':'Пакистан'
 };
 
-function autofillCountry(inputId){
-  const input = document.getElementById(inputId);
+function autofillCountryInput(input){
   const val = input.value.trim();
   if(!val || val.includes(',')) return;
   const country = CITY_COUNTRY[val.toLowerCase()];
   if(country) input.value = `${val}, ${country}`;
+}
+
+function autofillCountry(inputId){
+  autofillCountryInput(document.getElementById(inputId));
 }
 
 function fmtMoney(amount, currency){
@@ -604,6 +1188,15 @@ function fmtDate(d){
   if(!d) return '—';
   const [y,m,day] = d.split('-');
   return `${day}.${m}.${y}`;
+}
+
+function entryDateRange(costs){
+  const departs = (costs||[]).map(c => c.depart || c.serviceDate).filter(Boolean).sort();
+  const arrives = (costs||[]).map(c => c.arrive || c.serviceDate).filter(Boolean).sort();
+  return {
+    depart: departs.length ? departs[0] : '',
+    arrive: arrives.length ? arrives[arrives.length-1] : ''
+  };
 }
 
 function bitrixLink(num){
@@ -627,10 +1220,63 @@ async function loadEntries(){
           e.factCostCur = e.currency;
           e.factSaleCur = e.currency;
         }
-        e.planCostCur = e.planCostCur || 'USD';
         e.planSaleCur = e.planSaleCur || 'USD';
-        e.factCostCur = e.factCostCur || 'USD';
         e.factSaleCur = e.factSaleCur || 'USD';
+        if(!e.costs){
+          e.costs = [];
+          if(e.supplier || e.planCost != null || e.factCost != null){
+            e.costs.push({
+              id: 1,
+              name: e.supplier || '',
+              serviceType: '',
+              planCost: e.planCost ?? null,
+              planCostCur: e.planCostCur || 'USD',
+              factCost: e.factCost ?? null,
+              factCostCur: e.factCostCur || 'USD'
+            });
+          }
+        }
+        if(e.costs.length > 0 && e.costs[0].planSale === undefined &&
+           (e.planSale != null || e.factSale != null || e.received)){
+          e.costs[0].planSale = e.planSale ?? null;
+          e.costs[0].planSaleCur = e.planSaleCur || 'USD';
+          e.costs[0].factSale = e.factSale ?? null;
+          e.costs[0].factSaleCur = e.factSaleCur || 'USD';
+          e.costs[0].received = !!e.received;
+        }
+        e.costs.forEach((c, ci) => {
+          if(c.serviceType === undefined){
+            c.serviceType = c.isCustoms ? 'Таможенное оформление' : '';
+          }
+          if(c.paid === undefined){
+            c.paid = !!e.paid;
+          }
+          if(c.planSale === undefined) c.planSale = null;
+          if(c.planSaleCur === undefined) c.planSaleCur = 'USD';
+          if(c.factSale === undefined) c.factSale = null;
+          if(c.factSaleCur === undefined) c.factSaleCur = 'USD';
+          if(c.received === undefined) c.received = false;
+          if(c.transportType === undefined){
+            c.transportType = (ci === 0 && e.transport) ? e.transport : '';
+          }
+          if(c.depart === undefined){
+            c.depart = (ci === 0 && e.depart) ? e.depart : '';
+          }
+          if(c.arrive === undefined){
+            c.arrive = (ci === 0 && e.arrive) ? e.arrive : '';
+          }
+          if(c.serviceType === '' || c.serviceType === 'Последняя миля'){
+            c.serviceType = 'Перемещение';
+          }
+          if(c.serviceDate === undefined) c.serviceDate = '';
+          if(c.costVat === undefined) c.costVat = 0;
+          if(c.saleVat === undefined) c.saleVat = 0;
+        });
+        if(!e.combinedSale){
+          e.combinedSale = {enabled: false, planSale: null, planSaleCur: 'USD', factSale: null, factSaleCur: 'USD', vat: 0, received: false};
+        } else if(e.combinedSale.vat === undefined){
+          e.combinedSale.vat = 0;
+        }
       });
     }
   }catch(e){
@@ -645,35 +1291,6 @@ async function saveEntries(){
   }catch(e){
     showToast('Не удалось сохранить — попробуйте ещё раз');
   }
-  syncToCloud();
-}
-
-let _cloudTimer = null;
-function syncToCloud(){
-  if(_cloudTimer) clearTimeout(_cloudTimer);
-  _cloudTimer = setTimeout(async () => {
-    try{
-      const data = JSON.stringify({entries, nextId});
-      const base64 = btoa(unescape(encodeURIComponent(data)));
-      let sha = '';
-      try{
-        const ex = await fetch('https://api.github.com/repos/' + CLOUD_REPO + '/contents/' + CLOUD_PATH, {
-          headers: {Authorization: 'Bearer ' + CLOUD_T1 + CLOUD_T2, Accept: 'application/vnd.github.v3+json'}
-        });
-        if(ex.ok){
-          const exj = await ex.json();
-          sha = exj.sha;
-        }
-      }catch(e){}
-      const body = {message: 'sync', content: base64};
-      if(sha) body.sha = sha;
-      await fetch('https://api.github.com/repos/' + CLOUD_REPO + '/contents/' + CLOUD_PATH, {
-        method: 'PUT',
-        headers: {Authorization: 'Bearer ' + CLOUD_T1 + CLOUD_T2, 'Content-Type': 'application/json'},
-        body: JSON.stringify(body)
-      });
-    }catch(e){}
-  }, 2000);
 }
 
 function showToast(msg){
@@ -683,24 +1300,551 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'), 1800);
 }
 
+let costRowSeq = 1;
+
+const SERVICE_TYPE_PRESETS = ['Перемещение', 'Таможенное оформление', 'Сертификация', 'Страхование', 'Хранение', 'Погрузо-разгрузочные работы'];
+const MOVEMENT_TYPE = 'Перемещение';
+
+function costRowTemplate(row, startCollapsed){
+  const id = row.id || (costRowSeq++);
+  const wrap = document.createElement('div');
+  wrap.className = 'cost-card';
+  wrap.dataset.id = id;
+  const serviceType = row.serviceType || MOVEMENT_TYPE;
+  const isPreset = SERVICE_TYPE_PRESETS.includes(serviceType);
+  const isCustom = serviceType && !isPreset;
+  const isMovement = serviceType === MOVEMENT_TYPE;
+  const collapsed = !!startCollapsed;
+  const typeOptions = SERVICE_TYPE_PRESETS.map(t => `<option value="${t}"${t===serviceType?' selected':''}>${t}</option>`)
+    .concat(['<option value="__custom__">Другое (вписать)…</option>'])
+    .join('');
+  wrap.innerHTML = `
+    <div class="cost-card-top">
+      <button type="button" class="cost-card-toggle" onclick="toggleCardCollapse(this)" title="Свернуть/развернуть">${collapsed ? '▸' : '▾'}</button>
+      <select class="cost-type">${typeOptions}</select>
+      <input type="text" class="cost-type-custom" placeholder="Впишите тип услуги" style="display:${isCustom ? 'block' : 'none'};" value="${isCustom ? serviceType.replace(/"/g,'&quot;') : ''}">
+      <input type="text" class="cost-name" placeholder="Название подрядчика (необязательно)" list="contractorNamesList" value="${(row.name||'').replace(/"/g,'&quot;')}">
+      <span class="cost-card-summary" style="display:${collapsed ? 'inline' : 'none'};"></span>
+      <button type="button" class="del-btn cost-card-dup" onclick="duplicateCostRow(this)" title="Копировать карточку">⧉</button>
+      <button type="button" class="del-btn" onclick="removeCostRow(this)" title="Убрать карточку">✕</button>
+    </div>
+    <div class="cost-card-body" style="display:${collapsed ? 'none' : 'block'};">
+    <div class="cost-movement-block" style="display:${isMovement ? 'block' : 'none'};">
+      <div class="cost-card-route">
+        <input type="text" class="cost-from" placeholder="Откуда (если свой участок)" value="${(row.from||'').replace(/"/g,'&quot;')}">
+        <input type="text" class="cost-to" placeholder="Куда (если свой участок)" value="${(row.to||'').replace(/"/g,'&quot;')}">
+      </div>
+      <div class="cost-card-triple">
+        <div>
+          <label style="font-size:11px; color:var(--text-dim); display:block; margin-bottom:4px;">Дата выхода</label>
+          <input type="date" class="cost-depart" value="${row.depart || ''}">
+        </div>
+        <div>
+          <label style="font-size:11px; color:var(--text-dim); display:block; margin-bottom:4px;">Дата прибытия</label>
+          <input type="date" class="cost-arrive" value="${row.arrive || ''}">
+        </div>
+        <div>
+          <label style="font-size:11px; color:var(--text-dim); display:block; margin-bottom:4px;">Тип транспорта</label>
+          <select class="cost-transport">
+            <option value="">Не применимо</option>
+            <option value="FCL">FCL</option><option value="LCL">LCL</option><option value="AIR">AIR</option>
+            <option value="FTL">FTL</option><option value="LTL">LTL</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="cost-service-date-block" style="display:${isMovement ? 'none' : 'block'};">
+      <div class="field" style="margin-bottom:10px;">
+        <label style="font-size:11px; color:var(--text-dim); display:block; margin-bottom:4px;">Дата оказания услуги</label>
+        <input type="date" class="cost-service-date" value="${row.serviceDate || ''}">
+      </div>
+    </div>
+    <div class="cost-compare-table">
+      <div></div>
+      <div class="col-head">Себестоимость</div>
+      <div class="col-head sale-col">Счёт клиенту</div>
+      <div class="row-head">План</div>
+      <div class="amount-group">
+        <input type="number" class="cost-plan" step="0.01" value="${row.planCost ?? ''}">
+        <select class="cost-plan-cur">
+          <option value="USD">USD</option><option value="CNY">CNY</option><option value="INR">INR</option>
+          <option value="RUB">RUB</option><option value="EUR">EUR</option>
+        </select>
+      </div>
+      <div class="amount-group sale-col">
+        <input type="number" class="cost-sale-plan" step="0.01" value="${row.planSale ?? ''}">
+        <select class="cost-sale-plan-cur">
+          <option value="USD">USD</option><option value="CNY">CNY</option><option value="INR">INR</option>
+          <option value="RUB">RUB</option><option value="EUR">EUR</option>
+        </select>
+      </div>
+      <div class="row-head">Факт</div>
+      <div class="amount-group">
+        <input type="number" class="cost-fact" step="0.01" value="${row.factCost ?? ''}">
+        <select class="cost-fact-cur">
+          <option value="USD">USD</option><option value="CNY">CNY</option><option value="INR">INR</option>
+          <option value="RUB">RUB</option><option value="EUR">EUR</option>
+        </select>
+      </div>
+      <div class="amount-group sale-col">
+        <input type="number" class="cost-sale-fact" step="0.01" value="${row.factSale ?? ''}">
+        <select class="cost-sale-fact-cur">
+          <option value="USD">USD</option><option value="CNY">CNY</option><option value="INR">INR</option>
+          <option value="RUB">RUB</option><option value="EUR">EUR</option>
+        </select>
+      </div>
+      <div class="row-head">НДС</div>
+      <select class="cost-vat">
+        <option value="0">0%</option>
+        <option value="5">5%</option>
+        <option value="7">7%</option>
+        <option value="10">10%</option>
+        <option value="20">20%</option>
+        <option value="22">22%</option>
+      </select>
+      <select class="cost-sale-vat sale-col">
+        <option value="0">0%</option>
+        <option value="5">5%</option>
+        <option value="7">7%</option>
+        <option value="10">10%</option>
+        <option value="20">20%</option>
+        <option value="22">22%</option>
+      </select>
+    </div>
+    <div style="display:none;">
+      <input type="checkbox" class="cost-paid" ${row.paid ? 'checked' : ''}>
+      <input type="checkbox" class="cost-received" ${row.received ? 'checked' : ''}>
+    </div>
+    </div>
+  `;
+  wrap.querySelector('.cost-sale-plan-cur').value = row.planSaleCur || 'USD';
+  wrap.querySelector('.cost-sale-fact-cur').value = row.factSaleCur || 'USD';
+  if(document.getElementById('f_combined_sale') && document.getElementById('f_combined_sale').checked){
+    wrap.querySelectorAll('.sale-col').forEach(el => el.style.display = 'none');
+    wrap.querySelector('.cost-compare-table').classList.add('combined');
+  }
+  if(isCustom) wrap.querySelector('.cost-type').value = '__custom__';
+  wrap.querySelector('.cost-plan-cur').value = row.planCostCur || 'USD';
+  wrap.querySelector('.cost-transport').value = row.transportType || '';
+  wrap.querySelector('.cost-fact-cur').value = row.factCostCur || 'USD';
+  wrap.querySelector('.cost-vat').value = row.costVat ?? 0;
+  wrap.querySelector('.cost-sale-vat').value = row.saleVat ?? 0;
+  wrap.querySelector('.cost-from').addEventListener('blur', (ev) => autofillCountryInput(ev.target));
+  wrap.querySelector('.cost-to').addEventListener('blur', (ev) => autofillCountryInput(ev.target));
+  wrap.querySelector('.cost-sale-fact').addEventListener('input', function(){
+    const val = parseFloat(this.value);
+    wrap.querySelector('.cost-received').checked = !isNaN(val);
+  });
+  wrap.querySelector('.cost-type').addEventListener('change', (ev) => {
+    const customInput = wrap.querySelector('.cost-type-custom');
+    if(ev.target.value === '__custom__'){
+      customInput.style.display = 'block';
+      customInput.focus();
+    } else {
+      customInput.style.display = 'none';
+      customInput.value = '';
+    }
+    const nowMovement = ev.target.value === MOVEMENT_TYPE;
+    wrap.querySelector('.cost-movement-block').style.display = nowMovement ? 'block' : 'none';
+    wrap.querySelector('.cost-service-date-block').style.display = nowMovement ? 'none' : 'block';
+  });
+  if(collapsed) updateCardSummary(wrap);
+  return wrap;
+}
+
+function updateCardSummary(card){
+  const summaryEl = card.querySelector('.cost-card-summary');
+  if(!summaryEl) return;
+  const row = readCostCard(card);
+  const costTxt = row.factCost !== null ? fmtMoney(row.factCost, row.factCostCur) : (row.planCost !== null ? fmtMoney(row.planCost, row.planCostCur) + ' (план)' : null);
+  const saleTxt = row.factSale !== null ? fmtMoney(row.factSale, row.factSaleCur) : (row.planSale !== null ? fmtMoney(row.planSale, row.planSaleCur) + ' (план)' : null);
+  const parts = [];
+  if(costTxt) parts.push('себес ' + costTxt);
+  if(saleTxt) parts.push('клиенту ' + saleTxt);
+  summaryEl.textContent = parts.length ? '· ' + parts.join(' · ') : '';
+}
+
+function toggleCardCollapse(btn){
+  const card = btn.closest('.cost-card');
+  const body = card.querySelector('.cost-card-body');
+  const summaryEl = card.querySelector('.cost-card-summary');
+  const isCollapsed = body.style.display === 'none';
+  body.style.display = isCollapsed ? 'block' : 'none';
+  summaryEl.style.display = isCollapsed ? 'none' : 'inline';
+  btn.textContent = isCollapsed ? '▾' : '▸';
+  if(!isCollapsed) updateCardSummary(card);
+}
+
+function duplicateCostRow(btn){
+  const card = btn.closest('.cost-card');
+  const data = readCostCard(card);
+  addCostRow(data, {collapsed: false, after: card});
+}
+
+function toggleCombinedSale(){
+  const enabled = document.getElementById('f_combined_sale').checked;
+  document.getElementById('combinedSalePanel').style.display = enabled ? 'block' : 'none';
+  document.querySelectorAll('#costRows .sale-col').forEach(el => {
+    el.style.display = enabled ? 'none' : '';
+  });
+  document.querySelectorAll('#costRows .cost-compare-table').forEach(el => {
+    el.classList.toggle('combined', enabled);
+  });
+  updateLiveSummary();
+  renderPaymentChecklist();
+}
+
+function addCostRow(prefill, opts){
+  prefill = prefill || {};
+  opts = opts || {};
+  const container = document.getElementById('costRows');
+  const el = costRowTemplate(prefill, !!opts.collapsed);
+  if(opts.after && opts.after.nextSibling){
+    container.insertBefore(el, opts.after.nextSibling);
+  } else if(opts.after){
+    container.appendChild(el);
+  } else {
+    container.appendChild(el);
+  }
+  updateLiveSummary();
+  renderPaymentChecklist();
+  renderCostTimeline();
+}
+
+function removeCostRow(btn){
+  btn.closest('.cost-card').remove();
+  updateLiveSummary();
+  renderPaymentChecklist();
+  renderCostTimeline();
+}
+
+function clearCostRows(){
+  document.getElementById('costRows').innerHTML = '';
+  updateLiveSummary();
+  renderPaymentChecklist();
+  renderCostTimeline();
+}
+
+function loadCostRows(costs){
+  clearCostRows();
+  (costs || []).forEach(row => addCostRow(row, {collapsed: true}));
+  updateLiveSummary();
+  renderPaymentChecklist();
+  renderCostTimeline();
+}
+
+function renderCostTimeline(){
+  const el = document.getElementById('costTimeline');
+  if(!el) return;
+  const cards = document.querySelectorAll('#costRows .cost-card');
+  const stages = [];
+  cards.forEach(card => {
+    const typeVal = card.querySelector('.cost-type').value;
+    if(typeVal !== MOVEMENT_TYPE) return;
+    const from = card.querySelector('.cost-from').value.trim();
+    const to = card.querySelector('.cost-to').value.trim();
+    const transport = card.querySelector('.cost-transport').value;
+    const name = card.querySelector('.cost-name').value.trim();
+    if(!from && !to) return;
+    stages.push({from, to, transport, name});
+  });
+  if(stages.length === 0){
+    el.style.display = 'none';
+    el.innerHTML = '';
+    return;
+  }
+  el.style.display = 'flex';
+  el.innerHTML = stages.map((s, i) => `
+    <div class="timeline-stage">
+      <div class="timeline-dot"></div>
+      <div class="timeline-stage-label">
+        ${s.from || '—'} → ${s.to || '—'}
+        ${s.transport ? `<div class="hint">${s.transport}</div>` : ''}
+        ${s.name ? `<div class="hint">${s.name}</div>` : ''}
+      </div>
+    </div>
+    ${i < stages.length - 1 ? '<div class="timeline-connector"></div>' : ''}
+  `).join('');
+}
+
+function renderPaymentChecklist(){
+  const container = document.getElementById('paymentChecklist');
+  if(!container) return;
+  const cards = document.querySelectorAll('#costRows .cost-card');
+  const combinedEl = document.getElementById('f_combined_sale');
+  const combined = combinedEl && combinedEl.checked;
+
+  if(cards.length === 0){
+    container.innerHTML = '<div class="cost-row-empty">Добавьте подрядчика, чтобы отмечать оплаты</div>';
+    return;
+  }
+
+  let html = '';
+  cards.forEach((card, i) => {
+    const typeSelect = card.querySelector('.cost-type');
+    const typeVal = typeSelect.value === '__custom__'
+      ? card.querySelector('.cost-type-custom').value.trim()
+      : typeSelect.value;
+    const name = card.querySelector('.cost-name').value.trim();
+    const label = typeVal ? `${typeVal}${name ? ' — ' + name : ''}` : (name || `Подрядчик ${i+1}`);
+    const paidChecked = card.querySelector('.cost-paid').checked;
+    const receivedChecked = card.querySelector('.cost-received').checked;
+    const hasFactSale = card.querySelector('.cost-sale-fact').value.trim() !== '';
+    const receivedField = hasFactSale
+      ? `<label class="checkbox-field" title="Определяется фактической суммой клиенту — введена, значит получено">
+           <input type="checkbox" checked disabled>
+           <span>Получено от клиента <span style="color:var(--text-dim);">(по факту)</span></span>
+         </label>`
+      : `<label class="checkbox-field"><input type="checkbox" data-idx="${i}" class="pc-received" ${receivedChecked ? 'checked' : ''}><span>Получено от клиента</span></label>`;
+    html += `
+      <div class="payment-check-row">
+        <div class="payment-check-label">${label}</div>
+        <label class="checkbox-field"><input type="checkbox" data-idx="${i}" class="pc-paid" ${paidChecked ? 'checked' : ''}><span>Оплачено подрядчику</span></label>
+        ${combined ? '' : receivedField}
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+
+  container.querySelectorAll('.pc-paid').forEach(cb => {
+    cb.addEventListener('change', function(){
+      cards[+this.dataset.idx].querySelector('.cost-paid').checked = this.checked;
+      updateLiveSummary();
+    });
+  });
+  container.querySelectorAll('.pc-received').forEach(cb => {
+    cb.addEventListener('change', function(){
+      cards[+this.dataset.idx].querySelector('.cost-received').checked = this.checked;
+      updateLiveSummary();
+    });
+  });
+}
+
+function readCostCard(el){
+  const typeSelect = el.querySelector('.cost-type').value;
+  const serviceType = typeSelect === '__custom__'
+    ? el.querySelector('.cost-type-custom').value.trim()
+    : typeSelect;
+  const name = el.querySelector('.cost-name').value.trim();
+  const from = el.querySelector('.cost-from').value.trim();
+  const to = el.querySelector('.cost-to').value.trim();
+  const transportType = el.querySelector('.cost-transport').value;
+  const depart = el.querySelector('.cost-depart').value;
+  const arrive = el.querySelector('.cost-arrive').value;
+  const serviceDate = el.querySelector('.cost-service-date').value;
+  const planCost = parseFloat(el.querySelector('.cost-plan').value);
+  const factCost = parseFloat(el.querySelector('.cost-fact').value);
+  const paid = el.querySelector('.cost-paid').checked;
+  const planSale = parseFloat(el.querySelector('.cost-sale-plan').value);
+  const factSale = parseFloat(el.querySelector('.cost-sale-fact').value);
+  const received = el.querySelector('.cost-received').checked;
+  const costVat = parseInt(el.querySelector('.cost-vat').value, 10);
+  const saleVat = parseInt(el.querySelector('.cost-sale-vat').value, 10);
+  return {
+    name,
+    serviceType,
+    from, to,
+    transportType,
+    depart, arrive,
+    serviceDate,
+    planCost: isNaN(planCost) ? null : planCost,
+    planCostCur: el.querySelector('.cost-plan-cur').value,
+    factCost: isNaN(factCost) ? null : factCost,
+    factCostCur: el.querySelector('.cost-fact-cur').value,
+    costVat: isNaN(costVat) ? 0 : costVat,
+    paid,
+    planSale: isNaN(planSale) ? null : planSale,
+    planSaleCur: el.querySelector('.cost-sale-plan-cur').value,
+    factSale: isNaN(factSale) ? null : factSale,
+    factSaleCur: el.querySelector('.cost-sale-fact-cur').value,
+    saleVat: isNaN(saleVat) ? 0 : saleVat,
+    received
+  };
+}
+
+function collectCostRows(){
+  const rows = [];
+  document.querySelectorAll('#costRows .cost-card').forEach(el => {
+    rows.push(readCostCard(el));
+  });
+  return rows;
+}
+
+function groupByCurrency(costs, amountField, curField){
+  const sums = {};
+  (costs||[]).forEach(c => {
+    if(c[amountField] !== null && c[amountField] !== undefined){
+      sums[c[curField]] = (sums[c[curField]] || 0) + c[amountField];
+    }
+  });
+  return sums;
+}
+
+function currencyGroupText(sums){
+  const keys = Object.keys(sums);
+  if(keys.length === 0) return '—';
+  return keys.map(cur => fmtMoney(sums[cur], cur)).join(' + ');
+}
+
+function updateLiveSummary(){
+  const panel = document.getElementById('liveSummary');
+  if(!panel) return;
+  const costs = collectCostRows();
+
+  document.getElementById('liveCount').textContent = costs.length;
+
+  const costSums = groupByCurrency(costs, 'factCost', 'factCostCur');
+  const costSumsPlan = groupByCurrency(costs, 'planCost', 'planCostCur');
+  const saleSums = groupByCurrency(costs, 'factSale', 'factSaleCur');
+  const saleSumsPlan = groupByCurrency(costs, 'planSale', 'planSaleCur');
+  const combinedEnabled = document.getElementById('f_combined_sale').checked;
+  let liveSaleForDisplay = { sums: saleSums, sumsPlan: saleSumsPlan };
+  if(combinedEnabled){
+    const cp = parseFloat(document.getElementById('f_combined_plan_sale').value);
+    const cf = parseFloat(document.getElementById('f_combined_fact_sale').value);
+    const cpCur = document.getElementById('f_combined_plan_sale_cur').value;
+    const cfCur = document.getElementById('f_combined_fact_sale_cur').value;
+    liveSaleForDisplay.sums = isNaN(cf) ? {} : {[cfCur]: cf};
+    liveSaleForDisplay.sumsPlan = isNaN(cp) ? {} : {[cpCur]: cp};
+  }
+  document.getElementById('liveCost').textContent = Object.keys(costSums).length ? currencyGroupText(costSums) : currencyGroupText(costSumsPlan);
+  document.getElementById('liveSale').textContent = Object.keys(liveSaleForDisplay.sums).length ? currencyGroupText(liveSaleForDisplay.sums) : currencyGroupText(liveSaleForDisplay.sumsPlan);
+
+  const liveEntry = {
+    costs,
+    combinedSale: combinedEnabled ? {
+      enabled: true,
+      planSale: isNaN(parseFloat(document.getElementById('f_combined_plan_sale').value)) ? null : parseFloat(document.getElementById('f_combined_plan_sale').value),
+      planSaleCur: document.getElementById('f_combined_plan_sale_cur').value,
+      factSale: isNaN(parseFloat(document.getElementById('f_combined_fact_sale').value)) ? null : parseFloat(document.getElementById('f_combined_fact_sale').value),
+      factSaleCur: document.getElementById('f_combined_fact_sale_cur').value,
+      vat: parseInt(document.getElementById('f_combined_vat').value, 10) || 0
+    } : {enabled: false}
+  };
+  const factT = computeTotals(liveEntry, true);
+  const planT = computeTotals(liveEntry, false);
+  const marginEl = document.getElementById('liveMargin');
+  const useFact = factT.hasSale;
+  const t = useFact ? factT : planT;
+  if(!t.hasSale) marginEl.textContent = '—';
+  else if(t.missingRate) marginEl.textContent = noCbrText();
+  else marginEl.textContent = fmtMoney(Math.round(t.marginRub), 'RUB');
+}
+
+document.getElementById('costRows').addEventListener('input', updateLiveSummary);
+document.getElementById('costRows').addEventListener('change', updateLiveSummary);
+document.getElementById('costRows').addEventListener('input', renderPaymentChecklist);
+document.getElementById('costRows').addEventListener('change', renderPaymentChecklist);
+document.getElementById('costRows').addEventListener('input', renderCostTimeline);
+document.getElementById('costRows').addEventListener('change', renderCostTimeline);
+document.getElementById('combinedSalePanel').addEventListener('input', updateLiveSummary);
+document.getElementById('combinedSalePanel').addEventListener('change', updateLiveSummary);
+document.getElementById('f_combined_fact_sale').addEventListener('input', function(){
+  const val = parseFloat(this.value);
+  const hasFact = !isNaN(val);
+  const receivedCb = document.getElementById('f_combined_received');
+  receivedCb.checked = hasFact;
+  receivedCb.disabled = hasFact;
+});
+
 function clearForm(){
-  ['f_from','f_to','f_client','f_supplier','f_cargo','f_depart','f_arrive',
-   'f_plan_cost','f_plan_sale','f_fact_cost','f_fact_sale','f_bitrix'].forEach(id=>{
+  ['f_from','f_to','f_client','f_client_email','f_client_contact','f_cargo','f_bitrix'].forEach(id=>{
     document.getElementById(id).value = '';
   });
-  ['f_plan_cost_cur','f_plan_sale_cur','f_fact_cost_cur','f_fact_sale_cur'].forEach(id=>{
-    document.getElementById(id).selectedIndex = 0;
-  });
-  document.getElementById('f_transport').selectedIndex = 0;
   document.getElementById('f_status').selectedIndex = 0;
+  document.getElementById('f_combined_sale').checked = false;
+  document.getElementById('f_combined_plan_sale').value = '';
+  document.getElementById('f_combined_fact_sale').value = '';
+  document.getElementById('f_combined_vat').selectedIndex = 0;
+  document.getElementById('f_combined_received').checked = false;
+  document.getElementById('f_combined_received').disabled = false;
+  document.getElementById('combinedSalePanel').style.display = 'none';
+  clearCostRows();
   editingId = null;
   document.getElementById('editingBadge').style.display = 'none';
   document.getElementById('submitBtn').textContent = 'Добавить в таблицу';
 }
 
+let currentWizardStep = 1;
+
+function goToStep(n){
+  currentWizardStep = n;
+  document.querySelectorAll('.wizard-step').forEach(el => {
+    el.style.display = (+el.dataset.step === n) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.wizard-pill').forEach(el => {
+    const step = +el.dataset.step;
+    el.classList.toggle('active', step === n);
+    el.classList.toggle('done', step < n);
+  });
+  document.getElementById('wizardProgress').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
 function toggleEntryPanel(){
   const panel = document.getElementById('entryFormPanel');
-  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  const isOpen = panel.style.display === 'none';
+  panel.style.display = isOpen ? 'block' : 'none';
+  document.getElementById('liveSummaryOverlay').style.display = isOpen ? 'flex' : 'none';
+  if(isOpen){
+    updateLiveSummary();
+    goToStep(1);
+  }
+}
+
+function closeLiveSummary(){
+  document.getElementById('liveSummaryOverlay').style.display = 'none';
+}
+
+function switchSummaryTab(tab){
+  const entryBtn = document.getElementById('tabEntryBtn');
+  const allBtn = document.getElementById('tabAllBtn');
+  const entryView = document.getElementById('summaryEntryView');
+  const allView = document.getElementById('summaryAllView');
+  if(tab === 'all'){
+    allBtn.classList.add('active');
+    entryBtn.classList.remove('active');
+    allView.style.display = 'block';
+    entryView.style.display = 'none';
+    updateAllSummary();
+  } else {
+    entryBtn.classList.add('active');
+    allBtn.classList.remove('active');
+    entryView.style.display = 'block';
+    allView.style.display = 'none';
+    updateLiveSummary();
+  }
+}
+
+function updateAllSummary(){
+  const activeEl = document.getElementById('allActive');
+  const pendingEl = document.getElementById('allPending');
+  const marginEl = document.getElementById('allMargin');
+  if(!activeEl) return;
+
+  const active = entries.filter(e => e.status !== 'Закрыт').length;
+  let pending = 0, marginSum = 0, anyMissing = false, anyMargin = false;
+
+  entries.forEach(e => {
+    const costs = e.costs || [];
+    const combined = e.combinedSale && e.combinedSale.enabled;
+    const paidCount = costs.filter(c => c.paid).length;
+    const allPaid = costs.length > 0 && paidCount === costs.length;
+    const receivedFlag = combined ? !!(e.combinedSale && e.combinedSale.received) : costs.filter(c => c.received).length > 0;
+    if(receivedFlag && costs.length > 0 && !allPaid) pending++;
+
+    const factT = computeTotals(e, true);
+    if(factT.hasSale){
+      if(factT.missingRate) anyMissing = true;
+      else { marginSum += factT.marginRub; anyMargin = true; }
+    }
+  });
+
+  activeEl.textContent = active;
+  pendingEl.textContent = pending;
+  if(!anyMargin && !anyMissing) marginEl.textContent = '—';
+  else if(!anyMargin && anyMissing) marginEl.textContent = noCbrText();
+  else if(anyMissing) marginEl.textContent = fmtMoney(Math.round(marginSum), 'RUB') + ' *';
+  else marginEl.textContent = fmtMoney(Math.round(marginSum), 'RUB');
 }
 
 function editEntry(id){
@@ -711,23 +1855,28 @@ function editEntry(id){
   document.getElementById('f_from').value = e.from || '';
   document.getElementById('f_to').value = e.to || '';
   document.getElementById('f_client').value = e.client || '';
-  document.getElementById('f_supplier').value = e.supplier || '';
+  document.getElementById('f_client_email').value = e.clientEmail || '';
+  document.getElementById('f_client_contact').value = e.clientContact || '';
   document.getElementById('f_cargo').value = e.cargo || '';
-  document.getElementById('f_transport').value = e.transport || 'FCL';
-  document.getElementById('f_depart').value = e.depart || '';
-  document.getElementById('f_arrive').value = e.arrive || '';
   document.getElementById('f_status').value = e.status || 'Планируется';
-  document.getElementById('f_plan_cost').value = e.planCost ?? '';
-  document.getElementById('f_plan_cost_cur').value = e.planCostCur || 'USD';
-  document.getElementById('f_plan_sale').value = e.planSale ?? '';
-  document.getElementById('f_plan_sale_cur').value = e.planSaleCur || 'USD';
-  document.getElementById('f_fact_cost').value = e.factCost ?? '';
-  document.getElementById('f_fact_cost_cur').value = e.factCostCur || 'USD';
-  document.getElementById('f_fact_sale').value = e.factSale ?? '';
-  document.getElementById('f_fact_sale_cur').value = e.factSaleCur || 'USD';
+  loadCostRows(e.costs || []);
+  const cs = e.combinedSale;
+  document.getElementById('f_combined_sale').checked = !!(cs && cs.enabled);
+  document.getElementById('f_combined_plan_sale').value = cs ? (cs.planSale ?? '') : '';
+  document.getElementById('f_combined_plan_sale_cur').value = cs ? (cs.planSaleCur || 'USD') : 'USD';
+  document.getElementById('f_combined_fact_sale').value = cs ? (cs.factSale ?? '') : '';
+  document.getElementById('f_combined_fact_sale_cur').value = cs ? (cs.factSaleCur || 'USD') : 'USD';
+  document.getElementById('f_combined_vat').value = cs ? (cs.vat ?? 0) : 0;
+  const combinedHasFact = !!(cs && cs.factSale !== null && cs.factSale !== undefined);
+  document.getElementById('f_combined_received').checked = combinedHasFact ? true : !!(cs && cs.received);
+  document.getElementById('f_combined_received').disabled = combinedHasFact;
+  toggleCombinedSale();
   document.getElementById('editingBadge').style.display = 'block';
   document.getElementById('submitBtn').textContent = 'Сохранить изменения';
   document.getElementById('entryFormPanel').style.display = 'block';
+  document.getElementById('liveSummaryOverlay').style.display = 'flex';
+  switchSummaryTab('entry');
+  goToStep(1);
   document.getElementById('f_bitrix').closest('.card').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
@@ -738,24 +1887,27 @@ function addRow(){
     showToast('Заполните хотя бы "Откуда" и "Куда"');
     return;
   }
+  const combinedEnabled = document.getElementById('f_combined_sale').checked;
+  const cpSale = parseFloat(document.getElementById('f_combined_plan_sale').value);
+  const cfSale = parseFloat(document.getElementById('f_combined_fact_sale').value);
   const data = {
     bitrix: document.getElementById('f_bitrix').value.trim(),
     from, to,
     client: document.getElementById('f_client').value.trim(),
-    supplier: document.getElementById('f_supplier').value.trim(),
+    clientEmail: document.getElementById('f_client_email').value.trim(),
+    clientContact: document.getElementById('f_client_contact').value.trim(),
     cargo: document.getElementById('f_cargo').value.trim(),
-    transport: document.getElementById('f_transport').value,
-    depart: document.getElementById('f_depart').value,
-    arrive: document.getElementById('f_arrive').value,
     status: document.getElementById('f_status').value,
-    planCost: parseFloat(document.getElementById('f_plan_cost').value) || null,
-    planCostCur: document.getElementById('f_plan_cost_cur').value,
-    planSale: parseFloat(document.getElementById('f_plan_sale').value) || null,
-    planSaleCur: document.getElementById('f_plan_sale_cur').value,
-    factCost: parseFloat(document.getElementById('f_fact_cost').value) || null,
-    factCostCur: document.getElementById('f_fact_cost_cur').value,
-    factSale: parseFloat(document.getElementById('f_fact_sale').value) || null,
-    factSaleCur: document.getElementById('f_fact_sale_cur').value,
+    costs: collectCostRows(),
+    combinedSale: {
+      enabled: combinedEnabled,
+      planSale: isNaN(cpSale) ? null : cpSale,
+      planSaleCur: document.getElementById('f_combined_plan_sale_cur').value,
+      factSale: isNaN(cfSale) ? null : cfSale,
+      factSaleCur: document.getElementById('f_combined_fact_sale_cur').value,
+      vat: parseInt(document.getElementById('f_combined_vat').value, 10) || 0,
+      received: document.getElementById('f_combined_received').checked
+    },
   };
 
   if(editingId !== null){
@@ -790,10 +1942,163 @@ function statusClass(status){
   return 'status-transit';
 }
 
+let expandedIds = new Set();
+
+function toggleExpand(id){
+  if(expandedIds.has(id)) expandedIds.delete(id);
+  else expandedIds.add(id);
+  render();
+}
+
+function entryTotalsRub(costs, useFact){
+  let saleRub = 0, costRub = 0, missingRate = false, hasSale = false;
+  (costs||[]).forEach(c => {
+    const saleAmt = useFact ? c.factSale : c.planSale;
+    const saleCur = useFact ? c.factSaleCur : c.planSaleCur;
+    const costAmt = useFact ? c.factCost : c.planCost;
+    const costCur = useFact ? c.factCostCur : c.planCostCur;
+    if(saleAmt !== null && saleAmt !== undefined){
+      hasSale = true;
+      const r = useFact ? netFact(saleAmt, c.saleVat) : netRub(saleAmt, saleCur, c.saleVat);
+      if(r === null) missingRate = true; else saleRub += r;
+    }
+    if(costAmt !== null && costAmt !== undefined){
+      const r = useFact ? netFact(costAmt, c.costVat) : netRub(costAmt, costCur, c.costVat);
+      if(r === null) missingRate = true; else costRub += r;
+    }
+  });
+  // If the rate needed for any leg is unavailable, don't show a confidently
+  // wrong partial number — better to say "unknown" than a silently incomplete total.
+  if(missingRate){
+    return {saleRub: null, costRub: null, marginRub: null, missingRate: true, hasSale};
+  }
+  return {saleRub, costRub, marginRub: saleRub - costRub, missingRate: false, hasSale};
+}
+
+function computeTotals(e, useFact){
+  const costs = e.costs || [];
+  const cs = e.combinedSale;
+  if(!cs || !cs.enabled){
+    return entryTotalsRub(costs, useFact);
+  }
+  // Combined mode: one invoice covers all contractors — sum costs as usual,
+  // but take the sale side from the single combined invoice instead of per-leg.
+  let costRub = 0, missingRate = false;
+  costs.forEach(c => {
+    const amt = useFact ? c.factCost : c.planCost;
+    const cur = useFact ? c.factCostCur : c.planCostCur;
+    if(amt !== null && amt !== undefined){
+      const r = useFact ? netFact(amt, c.costVat) : netRub(amt, cur, c.costVat);
+      if(r === null) missingRate = true; else costRub += r;
+    }
+  });
+  const saleAmt = useFact ? cs.factSale : cs.planSale;
+  const saleCur = useFact ? cs.factSaleCur : cs.planSaleCur;
+  const hasSale = saleAmt !== null && saleAmt !== undefined;
+  if(!hasSale){
+    return {saleRub: null, costRub: null, marginRub: null, missingRate, hasSale: false};
+  }
+  const saleRub = useFact ? netFact(saleAmt, cs.vat) : netRub(saleAmt, saleCur, cs.vat);
+  if(saleRub === null) missingRate = true;
+  if(missingRate){
+    return {saleRub: null, costRub: null, marginRub: null, missingRate: true, hasSale};
+  }
+  return {saleRub, costRub, marginRub: saleRub - costRub, missingRate: false, hasSale};
+}
+
+function legMarginDisplay(c){
+  const factSaleRub = c.factSale !== null ? netFact(c.factSale, c.saleVat) : null;
+  const factCostRub = c.factCost !== null ? netFact(c.factCost, c.costVat) : null;
+  const planSaleRub = c.planSale !== null ? netRub(c.planSale, c.planSaleCur, c.saleVat) : null;
+  const planCostRub = c.planCost !== null ? netRub(c.planCost, c.planCostCur, c.costVat) : null;
+  const saleRub = c.factSale !== null ? factSaleRub : planSaleRub;
+  const costRub = c.factCost !== null ? factCostRub : planCostRub;
+  if(saleRub !== null && costRub !== null){
+    return fmtMoney(Math.round(saleRub - costRub), 'RUB');
+  }
+  // Only reachable when a plan-side amount is in a foreign currency with no CBR
+  // rate yet — facts never need the rate, so fall back to native-currency math
+  // for the plan-only side when possible.
+  const sale = c.factSale !== null ? c.factSale : c.planSale;
+  const saleCur = c.factSale !== null ? 'RUB' : c.planSaleCur;
+  const cost = c.factCost !== null ? c.factCost : c.planCost;
+  const costCur = c.factCost !== null ? 'RUB' : c.planCostCur;
+  if(sale !== null && cost !== null && saleCur === costCur && (c.saleVat||0) === (c.costVat||0)){
+    return fmtMoney(Math.round(sale - cost), saleCur) + (saleCur !== 'RUB' ? ' <span style="color:var(--text-dim);">(курс ЦБ недоступен)</span>' : '');
+  }
+  return '—';
+}
+
+function refreshNameSuggestions(){
+  const clientList = document.getElementById('clientNamesList');
+  const contractorList = document.getElementById('contractorNamesList');
+  if(!clientList || !contractorList) return;
+
+  const clients = new Set();
+  const contractors = new Set();
+  entries.forEach(e => {
+    if(e.client) clients.add(e.client);
+    (e.costs || []).forEach(c => {
+      if(c.name) contractors.add(c.name);
+    });
+  });
+
+  clientList.innerHTML = [...clients].map(v => `<option value="${v.replace(/"/g,'&quot;')}">`).join('');
+  contractorList.innerHTML = [...contractors].map(v => `<option value="${v.replace(/"/g,'&quot;')}">`).join('');
+}
+
+function updateStats(){
+  const activeEl = document.getElementById('statActive');
+  const pendingEl = document.getElementById('statPending');
+  const marginEl = document.getElementById('statMargin');
+  if(!activeEl) return;
+
+  const active = entries.filter(e => e.status !== 'Закрыт').length;
+
+  let pending = 0;
+  let marginSum = 0;
+  let anyMissing = false;
+  let anyMargin = false;
+
+  entries.forEach(e => {
+    const costs = e.costs || [];
+    const combined = e.combinedSale && e.combinedSale.enabled;
+    const paidCount = costs.filter(c => c.paid).length;
+    const allPaid = costs.length > 0 && paidCount === costs.length;
+    const receivedFlag = combined ? !!(e.combinedSale && e.combinedSale.received) : costs.filter(c => c.received).length > 0;
+    if(receivedFlag && costs.length > 0 && !allPaid) pending++;
+
+    const factT = computeTotals(e, true);
+    if(factT.hasSale){
+      if(factT.missingRate) anyMissing = true;
+      else { marginSum += factT.marginRub; anyMargin = true; }
+    }
+  });
+
+  activeEl.textContent = active;
+  pendingEl.textContent = pending;
+  if(!anyMargin && !anyMissing) marginEl.textContent = '—';
+  else if(!anyMargin && anyMissing) marginEl.textContent = noCbrText();
+  else if(anyMissing) marginEl.textContent = fmtMoney(Math.round(marginSum), 'RUB') + ' *';
+  else marginEl.textContent = fmtMoney(Math.round(marginSum), 'RUB');
+  marginEl.title = anyMissing ? 'По части заявок нет курса ЦБ — их маржа сюда не включена' : '';
+}
+
 function render(){
   const tbody = document.getElementById('tbody');
   const emptyState = document.getElementById('emptyState');
   tbody.innerHTML = '';
+
+  updateStats();
+  refreshNameSuggestions();
+
+  const rateNote = document.getElementById('cbrRateNote');
+  if(rateNote){
+    if(cbrStatus === 'ok') rateNote.textContent = `План — по курсу ЦБ РФ на ${cbrDate}, без НДС. Факт всегда без пересчёта курса (он уже в рублях по факту).`;
+    else if(cbrStatus === 'loading') rateNote.textContent = 'Считаю...';
+    else if(cbrStatus === 'idle') rateNote.textContent = 'Суммы по плану в валюте не посчитаны — нажмите «Рассчитать маржинальность» (факт считается сразу, без курса)';
+    else rateNote.textContent = 'Курс ЦБ РФ недоступен — план в валюте временно не посчитать (факт считается как обычно)';
+  }
 
   if(entries.length === 0){
     emptyState.style.display = 'block';
@@ -802,65 +2107,200 @@ function render(){
   emptyState.style.display = 'none';
 
   entries.forEach((e, idx) => {
-    const planMargin = (e.planCost !== null && e.planSale !== null && e.planCostCur === e.planSaleCur)
-      ? {val: e.planSale - e.planCost, cur: e.planCostCur} : null;
-    const factMargin = (e.factCost !== null && e.factSale !== null && e.factCostCur === e.factSaleCur)
-      ? {val: e.factSale - e.factCost, cur: e.factCostCur} : null;
+    const costs = e.costs || [];
+    const combined = e.combinedSale && e.combinedSale.enabled;
+    const planTotals = computeTotals(e, false);
+    const factTotals = computeTotals(e, true);
+    const paidCount = costs.filter(c => c.paid).length;
+    const receivedFlag = combined ? !!(e.combinedSale && e.combinedSale.received) : costs.filter(c => c.received).length > 0;
+    const receivedCount = costs.filter(c => c.received).length;
+    const allPaid = costs.length > 0 && paidCount === costs.length;
+    const alert = receivedFlag && costs.length > 0 && !allPaid;
+    const isOpen = expandedIds.has(e.id);
+
+    let paidSummaryClass = '';
+    if(costs.length > 0){
+      paidSummaryClass = allPaid ? 'pos' : (paidCount === 0 ? 'neg' : '');
+    }
+    let receivedSummaryClass = '';
+    if(combined){
+      receivedSummaryClass = receivedFlag ? 'pos' : 'neg';
+    } else if(costs.length > 0){
+      receivedSummaryClass = (receivedCount === costs.length) ? 'pos' : (receivedCount === 0 ? 'neg' : '');
+    }
 
     const tr = document.createElement('tr');
+    if(alert) tr.className = 'row-alert';
+    const marginPlanText = planTotals.missingRate ? noCbrText() : (planTotals.hasSale ? fmtMoney(Math.round(planTotals.marginRub), 'RUB') : '—');
+    const marginFactText = factTotals.missingRate ? noCbrText() : (factTotals.hasSale ? fmtMoney(Math.round(factTotals.marginRub), 'RUB') : '—');
+    const receivedLabel = combined ? (receivedFlag ? 'общий: да' : 'общий: нет') : (costs.length > 0 ? receivedCount + '/' + costs.length : '—');
+    const transportTypes = [...new Set(costs.map(c => c.transportType).filter(Boolean))];
+    const transportLabel = transportTypes.length ? transportTypes.join('/') : 'не применимо';
+    const dateRange = entryDateRange(costs);
+    const distinctDateKeys = new Set(costs.filter(c => c.depart || c.arrive).map(c => (c.depart||'') + '|' + (c.arrive||'')));
+    const datesDiffer = distinctDateKeys.size > 1;
+    const clientContactTitle = (e.clientEmail || e.clientContact)
+      ? [e.clientEmail, e.clientContact].filter(Boolean).join(' · ')
+      : '';
     tr.innerHTML = `
       <td>${idx+1}</td>
-      <td>${bitrixLink(e.bitrix)}</td>
-      <td>${e.from}</td>
-      <td>${e.to}</td>
-      <td>${e.client || '—'}</td>
-      <td>${e.supplier || '—'}</td>
-      <td>${e.cargo || '—'}</td>
-      <td>${e.transport}</td>
-      <td>${fmtDate(e.depart)}</td>
-      <td>${fmtDate(e.arrive)}</td>
-      <td><span class="badge ${statusClass(e.status)}">${e.status}</span></td>
-      <td class="num">${fmtMoney(e.planCost, e.planCostCur) ?? '—'}</td>
-      <td class="num">${fmtMoney(e.planSale, e.planSaleCur) ?? '—'}</td>
-      <td class="num">${planMargin ? fmtMoney(planMargin.val, planMargin.cur) : (e.planCost !== null && e.planSale !== null ? 'разн. вал.' : '—')}</td>
-      <td class="num">${fmtMoney(e.factCost, e.factCostCur) ?? '—'}</td>
-      <td class="num">${fmtMoney(e.factSale, e.factSaleCur) ?? '—'}</td>
-      <td class="num">${factMargin ? fmtMoney(factMargin.val, factMargin.cur) : (e.factCost !== null && e.factSale !== null ? 'разн. вал.' : '—')}</td>
       <td>
+        <div style="font-weight:600;">${bitrixLink(e.bitrix)} · <span${clientContactTitle ? ` title="${clientContactTitle}"` : ''}>${e.client || 'без клиента'}</span></div>
+        <div class="hint">${e.from} → ${e.to} · ${e.cargo || 'груз не указан'} · ${transportLabel} · ${costs.length ? costs.length + ' подр.' : 'без подрядчиков'}${combined ? ' · единый счёт' : ''}</div>
+      </td>
+      <td><span class="badge ${statusClass(e.status)}">${e.status}</span></td>
+      <td class="${alert ? 'cell-alert' : ''}" title="${alert ? 'Деньги получены хотя бы по одному счёту, кому-то из подрядчиков ещё не оплачено' : (datesDiffer ? 'У подрядчиков разные даты — показан общий диапазон, детали в развороте' : '')}">
+        <div>${fmtDate(dateRange.depart)} → ${fmtDate(dateRange.arrive)}${datesDiffer ? ' <span style="color:var(--text-dim);">*</span>' : ''}</div>
+      </td>
+      <td class="num ${alert ? 'cell-alert' : ''}" title="${alert ? 'Деньги получены хотя бы по одному счёту, кому-то из подрядчиков ещё не оплачено' : ''}">
+        <div style="font-weight:600;">${marginFactText}</div>
+        <div class="hint">план: ${marginPlanText}</div>
+      </td>
+      <td>
+        <div><span class="badge-mini ${receivedSummaryClass}">От кл. ${receivedLabel}</span></div>
+        <div style="margin-top:4px;"><span class="badge-mini ${paidSummaryClass}">Подр. ${costs.length > 0 ? paidCount + '/' + costs.length : '—'}</span></div>
+      </td>
+      <td>
+        <button class="expand-toggle" onclick="toggleExpand(${e.id})" title="Показать подрядчиков">${isOpen ? '▾' : '▸'}</button>
         <button class="del-btn" onclick="editEntry(${e.id})" title="Редактировать / дописать факт">✎</button>
         <button class="del-btn" onclick="deleteRow(${e.id})" title="Удалить">✕</button>
       </td>
     `;
     tbody.appendChild(tr);
+
+    if(isOpen){
+      const expandTr = document.createElement('tr');
+      expandTr.className = 'expand-row';
+      const clientContactLine = (e.clientEmail || e.clientContact)
+        ? `<div class="expand-subtotal" style="margin-bottom:8px;">Контакты клиента: ${[e.clientEmail, e.clientContact].filter(Boolean).join(' · ')}</div>`
+        : '';
+      let inner;
+      if(costs.length === 0){
+        inner = clientContactLine + `<div class="cost-row-empty">Подрядчики не указаны — добавьте их в форме редактирования (✎).</div>`;
+      } else {
+        const rowsHtml = costs.map((c, ci) => {
+          const isMovementLeg = (c.serviceType || MOVEMENT_TYPE) === MOVEMENT_TYPE;
+          const route = isMovementLeg
+            ? ((c.from || c.to) ? `${c.from || '—'} → ${c.to || '—'}` : '<span style="color:var(--text-dim);">общий маршрут</span>') + (c.transportType ? ` <span class="type-badge">${c.transportType}</span>` : '')
+              + ((c.depart || c.arrive) ? `<div class="hint">${fmtDate(c.depart)} → ${fmtDate(c.arrive)}</div>` : '')
+            : (c.serviceDate ? `<div class="hint">Дата услуги: ${fmtDate(c.serviceDate)}</div>` : '<span style="color:var(--text-dim);">—</span>');
+          const costVatBadge = c.costVat ? ` <span class="type-badge">НДС ${c.costVat}%</span>` : '';
+          const costCell = c.factCost !== null
+            ? fmtMoney(c.factCost, c.factCostCur) + costVatBadge
+            : (c.planCost !== null ? fmtMoney(c.planCost, c.planCostCur) + ' <span style="color:var(--text-dim);">(план)</span>' + costVatBadge : '—');
+          let saleCell, marginCell, receivedCell;
+          if(combined){
+            saleCell = '<span style="color:var(--text-dim);">в общем счёте</span>';
+            marginCell = '<span style="color:var(--text-dim);">—</span>';
+            receivedCell = '<span style="color:var(--text-dim);" title="Получено отмечается один раз за всю поставку">см. сумму за поставку</span>';
+          } else {
+            const saleVatBadge = c.saleVat ? ` <span class="type-badge">НДС ${c.saleVat}%</span>` : '';
+            saleCell = c.factSale !== null
+              ? fmtMoney(c.factSale, c.factSaleCur) + saleVatBadge
+              : (c.planSale !== null ? fmtMoney(c.planSale, c.planSaleCur) + ' <span style="color:var(--text-dim);">(план)</span>' + saleVatBadge : '—');
+            marginCell = legMarginDisplay(c);
+            receivedCell = (c.factSale !== null && c.factSale !== undefined)
+              ? `<input type="checkbox" checked disabled title="Определяется фактической суммой клиенту — введена, значит получено">`
+              : `<input type="checkbox" ${c.received ? 'checked' : ''} onchange="toggleCostFlag(${e.id}, ${ci}, 'received')" title="Получено от клиента по этому счёту">`;
+          }
+          const nameCell = c.serviceType
+            ? `<span class="type-badge">${c.serviceType}</span>${c.name ? ' ' + c.name : ''}`
+            : (c.name || 'Подрядчик без названия');
+          return `
+            <tr>
+              <td>${nameCell}</td>
+              <td>${route}</td>
+              <td>${costCell}</td>
+              <td>${saleCell}</td>
+              <td class="num">${marginCell}</td>
+              <td style="text-align:center;">${receivedCell}</td>
+              <td style="text-align:center;"><input type="checkbox" ${c.paid ? 'checked' : ''} onchange="toggleCostFlag(${e.id}, ${ci}, 'paid')" title="Оплачено этому подрядчику"></td>
+            </tr>
+          `;
+        }).join('');
+        const combinedHasFact = e.combinedSale.factSale !== null && e.combinedSale.factSale !== undefined;
+        const combinedReceivedField = combinedHasFact
+          ? `<label class="checkbox-field" style="margin:0; padding:4px 10px;" title="Определяется фактической суммой — введена, значит получено">
+               <input type="checkbox" checked disabled>
+               <span>Получено <span style="color:var(--text-dim);">(по факту)</span></span>
+             </label>`
+          : `<label class="checkbox-field" style="margin:0; padding:4px 10px;">
+               <input type="checkbox" ${e.combinedSale.received ? 'checked' : ''} onchange="toggleCombinedReceived(${e.id})">
+               <span>Получено</span>
+             </label>`;
+        const combinedBanner = combined ? `
+          <div class="expand-subtotal" style="margin-bottom:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <span>Сумма клиенту за всю поставку: план ${fmtMoney(e.combinedSale.planSale, e.combinedSale.planSaleCur) ?? '—'} · факт ${fmtMoney(e.combinedSale.factSale, e.combinedSale.factSaleCur) ?? '—'}</span>
+            ${combinedReceivedField}
+          </div>
+        ` : '';
+        inner = `
+          ${clientContactLine}
+          ${combinedBanner}
+          <table class="expand-cost-table">
+            <thead><tr><th>Подрядчик / услуга</th><th>Маршрут (участок)</th><th>Себестоимость</th><th>Счёт клиенту</th><th>Маржа, ₽</th><th>От клиента</th><th>Подрядчику</th></tr></thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+          <div class="expand-subtotal">Курс ЦБ${cbrDate ? ' на ' + cbrDate : ''} · для строк без факта показан план</div>
+        `;
+      }
+      expandTr.innerHTML = `<td colspan="7">${inner}</td>`;
+      tbody.appendChild(expandTr);
+    }
   });
 }
 
-function exportCSV(){
-  if(entries.length === 0){
-    showToast('Нет данных для выгрузки');
-    return;
-  }
-  const headers = ['№ Bitrix','Откуда','Куда','Клиент','Подрядчик','Груз','Тип транспорта','Дата выхода','Дата прибытия',
-    'План.себес','Вал.','План.продажа','Вал.','Факт.себес','Вал.','Факт.продажа','Вал.','Статус'];
-  const rows = entries.map(e => [
-    e.bitrix, e.from, e.to, e.client, e.supplier, e.cargo, e.transport, e.depart, e.arrive,
-    e.planCost ?? '', e.planCost !== null ? e.planCostCur : '',
-    e.planSale ?? '', e.planSale !== null ? e.planSaleCur : '',
-    e.factCost ?? '', e.factCost !== null ? e.factCostCur : '',
-    e.factSale ?? '', e.factSale !== null ? e.factSaleCur : '',
-    e.status
-  ]);
-  let csv = '\uFEFF' + headers.join(';') + '\n';
-  rows.forEach(r => {
-    csv += r.map(v => `"${String(v ?? '').replace(/"/g,'""')}"`).join(';') + '\n';
-  });
-  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'postavki.csv';
-  a.click();
-  URL.revokeObjectURL(url);
+function toggleCostFlag(id, costIndex, field){
+  const idx = entries.findIndex(e => e.id === id);
+  if(idx === -1) return;
+  const cost = entries[idx].costs[costIndex];
+  if(!cost) return;
+  cost[field] = !cost[field];
+  saveEntries();
+  render();
+}
+
+function toggleCombinedReceived(id){
+  const idx = entries.findIndex(e => e.id === id);
+  if(idx === -1 || !entries[idx].combinedSale) return;
+  entries[idx].combinedSale.received = !entries[idx].combinedSale.received;
+  saveEntries();
+  render();
+}
+
+function costsToText(costs, combinedSale){
+  const combined = combinedSale && combinedSale.enabled;
+  const base = (costs || []).map(c => {
+    const isMovementLeg = (c.serviceType || MOVEMENT_TYPE) === MOVEMENT_TYPE;
+    const route = isMovementLeg
+      ? ((c.from || c.to) ? ` [${c.from||'—'} → ${c.to||'—'}${c.transportType ? ', ' + c.transportType : ''}]` : (c.transportType ? ` [${c.transportType}]` : ''))
+      : '';
+    const dates = isMovementLeg
+      ? ((c.depart || c.arrive) ? ` (${c.depart ? fmtDate(c.depart) : '—'} → ${c.arrive ? fmtDate(c.arrive) : '—'})` : '')
+      : (c.serviceDate ? ` (дата услуги: ${fmtDate(c.serviceDate)})` : '');
+    const label = c.serviceType ? `${c.serviceType}${c.name ? ' — ' + c.name : ''}` : (c.name || 'Подрядчик');
+    const saleInfo = (!combined && (c.planSale !== null || c.factSale !== null))
+      ? `, клиенту план ${c.planSale ?? '—'} ${c.planSaleCur}, факт ${c.factSale ?? '—'} ${c.factSaleCur} (${c.received ? 'получено' : 'не получено'})`
+      : '';
+    return `${label}${route}${dates}: себес план ${c.planCost ?? '—'} ${c.planCostCur}, факт ${c.factCost ?? '—'} ${c.factCostCur} (${c.paid ? 'оплачено' : 'не оплачено'})${saleInfo}`;
+  }).join(' | ');
+  if(!combined) return base;
+  const cs = combinedSale;
+  const combinedText = `Сумма клиенту за всю поставку: план ${cs.planSale ?? '—'} ${cs.planSaleCur}, факт ${cs.factSale ?? '—'} ${cs.factSaleCur} (${cs.received ? 'получено' : 'не получено'})`;
+  return combinedText + (base ? ' || ' + base : '');
+}
+
+function paidSummaryText(costs){
+  if(!costs || costs.length === 0) return '';
+  const paidCount = costs.filter(c => c.paid).length;
+  return `${paidCount}/${costs.length}`;
+}
+
+function receivedSummaryText(costs, combinedSale){
+  if(combinedSale && combinedSale.enabled) return combinedSale.received ? 'да (за поставку)' : 'нет (за поставку)';
+  if(!costs || costs.length === 0) return '';
+  const receivedCount = costs.filter(c => c.received).length;
+  return `${receivedCount}/${costs.length}`;
 }
 
 function exportExcel(){
@@ -868,24 +2308,24 @@ function exportExcel(){
     showToast('Нет данных для выгрузки');
     return;
   }
-  const headers = ['№','№ Bitrix','Откуда','Куда','Клиент','Подрядчик','Груз','Тип транспорта',
+  const headers = ['№','№ Bitrix','Откуда','Куда','Клиент','Почта клиента','Телефон/телеграм клиента','Груз','Тип(ы) транспорта',
     'Дата выхода','Дата прибытия','Статус',
-    'План. себестоимость','Вал.','План. сумма продажи','Вал.',
-    'Факт. себестоимость','Вал.','Факт. сумма продажи','Вал.',
-    'План. маржа','Факт. маржа'];
+    `План. продажа, ₽ (ЦБ${cbrDate ? ' ' + cbrDate : ''})`,`Факт. продажа, ₽`,
+    'План. маржа, ₽','Факт. маржа, ₽',
+    'Подрядчики и счета (детально)','Получено от клиента','Оплачено подрядчикам'];
   const rows = entries.map((e, idx) => {
-    const planMargin = (e.planCost !== null && e.planSale !== null && e.planCostCur === e.planSaleCur)
-      ? Math.round(e.planSale - e.planCost) : '';
-    const factMargin = (e.factCost !== null && e.factSale !== null && e.factCostCur === e.factSaleCur)
-      ? Math.round(e.factSale - e.factCost) : '';
+    const planT = computeTotals(e, false);
+    const factT = computeTotals(e, true);
+    const transportTypes = [...new Set((e.costs||[]).map(c => c.transportType).filter(Boolean))];
+    const dateRange = entryDateRange(e.costs || []);
     return [
-      idx+1, e.bitrix || '', e.from, e.to, e.client || '', e.supplier || '', e.cargo || '', e.transport,
-      e.depart ? fmtDate(e.depart) : '', e.arrive ? fmtDate(e.arrive) : '', e.status,
-      e.planCost ?? '', e.planCost !== null ? e.planCostCur : '',
-      e.planSale ?? '', e.planSale !== null ? e.planSaleCur : '',
-      e.factCost ?? '', e.factCost !== null ? e.factCostCur : '',
-      e.factSale ?? '', e.factSale !== null ? e.factSaleCur : '',
-      planMargin, factMargin
+      idx+1, e.bitrix || '', e.from, e.to, e.client || '', e.clientEmail || '', e.clientContact || '', e.cargo || '', transportTypes.length ? transportTypes.join('/') : 'не применимо',
+      dateRange.depart ? fmtDate(dateRange.depart) : '', dateRange.arrive ? fmtDate(dateRange.arrive) : '', e.status,
+      (planT.hasSale && !planT.missingRate) ? Math.round(planT.saleRub) : (planT.missingRate ? noCbrText() : ''),
+      (factT.hasSale && !factT.missingRate) ? Math.round(factT.saleRub) : (factT.missingRate ? noCbrText() : ''),
+      (planT.hasSale && !planT.missingRate) ? Math.round(planT.marginRub) : (planT.missingRate ? noCbrText() : ''),
+      (factT.hasSale && !factT.missingRate) ? Math.round(factT.marginRub) : (factT.missingRate ? noCbrText() : ''),
+      costsToText(e.costs, e.combinedSale), receivedSummaryText(e.costs, e.combinedSale), paidSummaryText(e.costs)
     ];
   });
   const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
@@ -893,34 +2333,6 @@ function exportExcel(){
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Поставки');
   XLSX.writeFile(wb, 'postavki.xlsx');
-}
-
-const CLOUD_REPO = 'kooovash-ux/shipments-tracker';
-const CLOUD_PATH = 'data/shipments.json';
-const CLOUD_T1 = 'gho_QEh';
-const CLOUD_T2 = 'QMcgTa8qb617YSIPkcgGjzOoyJv35L7YQ';
-
-async function loadFromCloud(){
-  try{
-    const res = await fetch('https://api.github.com/repos/' + CLOUD_REPO + '/contents/' + CLOUD_PATH, {
-      headers: {Accept: 'application/vnd.github.v3+json'}
-    });
-    if(!res.ok) return false;
-    const data = await res.json();
-    const json = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-    if(!json.entries || !json.entries.length) return false;
-    entries = json.entries;
-    nextId = json.nextId || (entries.length + 1);
-    editingId = null;
-    clearForm();
-    try{
-      await storageAPI.set('shipments-list', JSON.stringify({entries, nextId}), false);
-    }catch(e){}
-    render();
-    return true;
-  }catch(e){
-    return false;
-  }
 }
 
 document.getElementById('f_from').addEventListener('blur', () => autofillCountry('f_from'));
