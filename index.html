@@ -1104,20 +1104,72 @@ function noCbrText(){
   return cbrStatus === 'idle' ? 'не рассчитано' : 'нет курса';
 }
 
+const GH_OWNER = 'kooovash-ux';
+const GH_REPO = 'shipments-tracker';
+const GH_PATH = 'data/shipments.json';
+const GH_BRANCH = 'master';
+const GH_TOKEN = 'gho_QEhQMcYD2RUPNKGhqoNUTIURnBIP1S7YQ';
+
+async function ghRead(){
+  try{
+    const res = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_PATH}`, {
+      headers: {'Authorization': 'Bearer ' + GH_TOKEN, 'Accept': 'application/vnd.github.v3+json'}
+    });
+    if(!res.ok) return null;
+    const data = await res.json();
+    const content = atob(data.content);
+    return {entries: JSON.parse(content).entries || [], nextId: JSON.parse(content).nextId || 1, sha: data.sha};
+  }catch(e){
+    return null;
+  }
+}
+
+async function ghWrite(dataStr, sha){
+  const body = {
+    message: 'sync: update shipments data',
+    content: btoa(unescape(encodeURIComponent(dataStr))),
+    branch: GH_BRANCH
+  };
+  if(sha) body.sha = sha;
+  try{
+    const res = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_PATH}`, {
+      method: 'PUT',
+      headers: {'Authorization': 'Bearer ' + GH_TOKEN, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
+    });
+    return res.ok;
+  }catch(e){
+    return false;
+  }
+}
+
 const storageAPI = {
   async get(key, shared){
+    // Try GitHub cloud first
+    const cloud = await ghRead();
+    if(cloud && cloud.entries){
+      // Cache locally too
+      localStorage.setItem(key, JSON.stringify({entries: cloud.entries, nextId: cloud.nextId}));
+      return {key, value: JSON.stringify({entries: cloud.entries, nextId: cloud.nextId}), shared};
+    }
+    // Fallback to localStorage
     if(typeof window.storage !== 'undefined') return window.storage.get(key, shared);
     const val = localStorage.getItem(key);
     return val !== null ? {key, value: val, shared} : null;
   },
   async set(key, value, shared){
-    if(typeof window.storage !== 'undefined') return window.storage.set(key, value, shared);
     localStorage.setItem(key, value);
+    // Push to GitHub in background
+    const sha = (await ghRead())?.sha;
+    ghWrite(value, sha).then(ok => {
+      if(!ok && !getGhToken()){} // no token = expected
+    });
+    if(typeof window.storage !== 'undefined') return window.storage.set(key, value, shared);
     return {key, value, shared};
   },
   async delete(key, shared){
-    if(typeof window.storage !== 'undefined') return window.storage.delete(key, shared);
     localStorage.removeItem(key);
+    if(typeof window.storage !== 'undefined') return window.storage.delete(key, shared);
     return {key, deleted:true, shared};
   }
 };
