@@ -969,8 +969,7 @@
       </div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;margin:0 0 12px;flex-wrap:wrap">
-        <button class="btn-primary" onclick="saveToSheet()" style="background:var(--green)">💾 Скачать CSV (импорт в таблицу)</button>
-        <button class="btn-primary" onclick="loadFromSheet()">📥 Загрузить из таблицы</button>
+        <span style="font-size:12px;color:var(--text-dim)">🔄 Автосинхронизация с Google Таблицей</span>
       </div>
       <div class="table-wrap">
     <table id="dataTable">
@@ -2493,8 +2492,9 @@ function exportExcel(){
   XLSX.writeFile(wb, 'postavki.xlsx');
 }
 
-// ===== Sheet.best API (Google Sheets) =====
+// ===== Sheet.best API (автоматически) =====
 const API_URL = 'https://api.sheetbest.com/sheets/4828e86e-bd53-4ce7-a09e-ae1e13b196eb';
+let _saveTimer = null;
 
 async function loadFromSheet(){
   try{
@@ -2510,30 +2510,31 @@ async function loadFromSheet(){
       entries.push(e);
     });
     saveState(); renderTable();
-    showToast('Загружено из Google Таблицы ✅');
   } catch(e){}
 }
 
-async function saveToSheet(){
-  const headers = ['bitrix','from','to','client','cargo','status','cost_plan','cost_fact','sale_plan','sale_fact','margin'];
-  const rows = entries.map(e => {
-    let obj = {};
-    headers.forEach(h => obj[h] = e[h] || '');
-    return obj;
-  });
-  try{
-    // Delete all then re-insert
-    await fetch(API_URL + '/all', {method: 'DELETE'});
-    if(rows.length > 0){
-      await fetch(API_URL, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(rows)
-      });
-    }
-    showToast('Сохранено в Google Таблицу ✅');
-  } catch(e){ showToast('Ошибка: ' + e.message); }
+function autoSave(){
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(async () => {
+    if(!entries || entries.length === 0) return;
+    const headers = ['bitrix','from','to','client','cargo','status','cost_plan','cost_fact','sale_plan','sale_fact','margin'];
+    const rows = entries.map(e => {
+      let obj = {};
+      headers.forEach(h => obj[h] = e[h] || '');
+      return obj;
+    });
+    try{
+      await fetch(API_URL + '/all', {method: 'DELETE'});
+      if(rows.length > 0){
+        await fetch(API_URL, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(rows)});
+      }
+    } catch(e){}
+  }, 1000);
 }
+
+// Patch saveState to auto-save
+const _origSave = saveState;
+saveState = function(){ _origSave(); autoSave(); };
 
 setTimeout(loadFromSheet, 1500);
 
