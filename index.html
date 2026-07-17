@@ -2492,60 +2492,29 @@ function exportExcel(){
   XLSX.writeFile(wb, 'postavki.xlsx');
 }
 
-// ===== Sheet.best API (автоматически) =====
-const API_URL = 'https://api.sheetbest.com/sheets/4828e86e-bd53-4ce7-a09e-ae1e13b196eb';
-let _saveTimer = null;
+// ===== Загрузка данных с GitHub =====
+const DATA_URL = 'https://raw.githubusercontent.com/kooovash-ux/shipments-tracker/master/data/seed.json';
 
-async function loadFromSheet(){
+async function loadSeed(){
   try{
-    const r = await fetch(API_URL);
+    const r = await fetch(DATA_URL);
     if(!r.ok) return;
     const data = await r.json();
     if(!data || data.length === 0) return;
-    const parsed = data.map(row => {
-      try{
-        // Try to parse as JSON first
-        if(row.json && row.json.startsWith('{')) return JSON.parse(row.json);
-        // Fallback: flat row
-        let e = {costs: []};
-        Object.keys(row).forEach(k => e[k] = row[k] || '');
-        return e;
-      } catch(e){ return null; }
-    }).filter(e => e);
-    if(parsed.length > 0){
-      entries.length = 0;
-      entries.push(...parsed);
-      saveState(); renderTable();
-    }
+    entries.length = 0;
+    data.forEach(row => {
+      let e = {id: Date.now() + Math.random(), costs: row.costs || [], combinedSale: row.combinedSale || {enabled: false}};
+      Object.assign(e, row);
+      entries.push(e);
+    });
+    saveState(); renderTable();
   } catch(e){}
 }
 
-function autoSave(){
-  clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(async () => {
-    if(!entries || entries.length === 0) return;
-    try{
-      const rows = entries.map(e => ({json: JSON.stringify(e)}));
-      // Delete all first
-      const meta = await fetch(API_URL);
-      const existing = await meta.json();
-      for(let i = 0; i < existing.length; i++){
-        await fetch(API_URL + '/' + (i+1), {method: 'DELETE'}).catch(()=>{});
-      }
-      // Insert
-      await fetch(API_URL, {
-        method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(rows)
-      });
-    } catch(e){}
-  }, 1000);
-}
-
 const _origSave = saveState;
-saveState = function(){ _origSave(); autoSave(); };
+saveState = function(){ _origSave(); };
 
-setTimeout(loadFromSheet, 1500);
-setTimeout(loadFromSheet, 1500);
+setTimeout(loadSeed, 1500);
 
 document.getElementById('f_from').addEventListener('blur', () => autofillCountry('f_from'));
 document.getElementById('f_to').addEventListener('blur', () => autofillCountry('f_to'));
