@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Поставки — учёт</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://apis.google.com/js/api.js"></script>
 <style>
   :root{
     --green:#21A038;
@@ -967,14 +968,13 @@
       <button class="btn-primary" id="cbrRefreshBtn" onclick="refreshCbrRates()">Рассчитать маржинальность</button>
       <button class="btn-primary" onclick="exportExcel()">Excel</button>
       </div>
-      <div style="display:flex;gap:8px;align-items:center;margin:0 0 16px;flex-wrap:wrap">
-      <button class="btn-primary" onclick="saveToCloud()" style="background:var(--green)">☁️ Sync</button>
-      <input id="gh_token_input" type="password" placeholder="GitHub токен (один раз)" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px">
-      <button onclick="localStorage.setItem('gh_token',document.getElementById('gh_token_input').value);showToast('Токен сохранён')" style="padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:var(--panel-2);cursor:pointer">💾</button>
       </div>
-      <div id="toolbarExtra" style="display:flex;gap:8px;align-items:center;margin:0 0 16px"></div>
-  </div>
-  <div class="table-wrap">
+      <div style="display:flex;gap:8px;align-items:center;margin:0 0 12px;flex-wrap:wrap">
+      <div id="gSignIn" style="margin-right:8px"></div>
+      <button class="btn-primary" onclick="saveToSheet()" style="background:var(--green)">💾 Сохранить в таблицу</button>
+      <button class="btn-primary" onclick="loadFromSheet()">📥 Загрузить из таблицы</button>
+      </div>
+      <div class="table-wrap">
     <table id="dataTable">
       <thead>
         <tr>
@@ -2495,84 +2495,71 @@ function exportExcel(){
   XLSX.writeFile(wb, 'postavki.xlsx');
 }
 
-// ===== Шифрование + облако (GitHub data.json) =====
-const DATA_URL = 'https://raw.githubusercontent.com/kooovash-ux/shipments-tracker/master/data.json';
-const API_URL = 'https://api.github.com/repos/kooovash-ux/shipments-tracker/contents/data.json';
+// ===== Google Sheets sync (через gapi, без секретов) =====
+const SHEET_ID = '1KYFzP4jAjbkyCrABvqO-6ZG5QhGtW_TF5DqRbQi8ze4';
+const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTEUQKvhT-uIBexAZadJaK7DcGn2w4ZWoL7GQxLPu70iBCsl7vklHZEwau5Oe7l1nJDUiiCvHsk_gVI/pub?output=csv';
+const CLIENT_ID = '1072295463604-9hj6hgmk4i85qr2vf2kgua7v2kg3u5ca.apps.googleusercontent.com';
 
-function getCryptoKey(){
-  const pwd = localStorage.getItem('crypt_pwd') || 'navayana2026';
-  const enc = new TextEncoder();
-  return crypto.subtle.importKey('raw', enc.encode(pwd.padEnd(16,'.').slice(0,16)),
-    {name:'AES-CBC'}, false, ['encrypt','decrypt']);
-}
-async function encryptData(obj){
-  const key = await getCryptoKey();
-  const iv = crypto.getRandomValues(new Uint8Array(16));
-  const data = new TextEncoder().encode(JSON.stringify(obj));
-  const encrypted = await crypto.subtle.encrypt({name:'AES-CBC', iv}, key, data);
-  const combined = new Uint8Array(iv.length + encrypted.byteLength);
-  combined.set(iv); combined.set(new Uint8Array(encrypted), iv.length);
-  return btoa(String.fromCharCode(...combined));
-}
-async function decryptData(str){
-  try{
-    const raw = Uint8Array.from(atob(str), c=>c.charCodeAt(0));
-    const iv = raw.slice(0,16);
-    const data = raw.slice(16);
-    const key = await getCryptoKey();
-    const decrypted = await crypto.subtle.decrypt({name:'AES-CBC', iv}, key, data);
-    return JSON.parse(new TextDecoder().decode(decrypted));
-  } catch(e){ return null; }
+let gToken = localStorage.getItem('gs_token') || null;
+
+function initGoogleAuth(){
+  gapi.load('client:auth2', () => {
+    gapi.client.init({clientId: CLIENT_ID, scope: 'https://www.googleapis.com/auth/spreadsheets'}).then(() => {
+      const auth = gapi.auth2.getAuthInstance();
+      if(auth.isSignedIn.get()){
+        gToken = auth.currentUser.get().getAuthResponse().access_token;
+        localStorage.setItem('gs_token', gToken);
+      }
+      document.getElementById('gSignIn').innerHTML = auth.isSignedIn.get()
+        ? '<button onclick="gapi.auth2.getAuthInstance().signOut();localStorage.removeItem(\'gs_token\');location.reload()" style="padding:6px 14px;border:1px solid var(--border);border-radius:8px;cursor:pointer">Выйти</button>'
+        : '<button onclick="gapi.auth2.getAuthInstance().signIn().then(()=>{gToken=gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;localStorage.setItem(\'gs_token\',gToken);showToast(\'Вошли ✅\')})" style="padding:6px 14px;border:1px solid var(--border);border-radius:8px;cursor:pointer">🔑 Войти через Google</button>';
+      if(auth.isSignedIn.get()) showToast('Google вход ✅');
+    });
+  });
 }
 
-async function loadFromCloud(){
+async function loadFromSheet(){
   try{
-    const r = await fetch(DATA_URL);
-    if(!r.ok) return;
-    const cloud = await r.json();
-    if(!cloud.enc) return;
-    const decrypted = await decryptData(cloud.enc);
-    if(decrypted && decrypted.entries && decrypted.entries.length > 0){
-      entries.length = 0;
-      entries.push(...decrypted.entries);
-      saveState(); renderTable();
-      showToast('Загружено из облака 🔐');
+    const r = await fetch(SHEET_CSV);
+    const csv = await r.text();
+    const lines = csv.trim().split('\n').filter(l => l);
+    if(lines.length < 2) return;
+    const keys = lines[0].split(',').map(k => k.trim());
+    entries.length = 0;
+    for(let i = 1; i < lines.length; i++){
+      const vals = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
+      let e = {costs: []};
+      keys.forEach((k, j) => e[k] = vals[j] || '');
+      entries.push(e);
     }
+    saveState(); renderTable();
+    showToast('Загружено из Google Таблицы 📊');
   } catch(e){}
 }
-async function saveToCloud(){
-  const token = localStorage.getItem('gh_token');
-  if(!token){ showToast('Сначала вставь GitHub токен'); return; }
+
+async function saveToSheet(){
+  if(!gToken){ showToast('Нажми "Войти через Google"'); return; }
+  const headers = ['bitrix','from','to','client','cargo','status','cost_plan','cost_fact','sale_plan','sale_fact','margin'];
+  const rows = entries.map(e => headers.map(h => e[h] || ''));
   try{
-    const enc = await encryptData({entries});
-    const r = await fetch(API_URL, {
-      method: 'GET', headers: {'Accept': 'application/vnd.github+json'}
-    });
-    const cur = await r.json();
-    const r2 = await fetch(API_URL, {
+    const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1?valueInputOption=RAW`, {
       method: 'PUT',
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-        'Accept': 'application/vnd.github+json'
-      },
-      body: JSON.stringify({
-        message: 'Sync shipments data',
-        content: btoa(unescape(encodeURIComponent(JSON.stringify({enc})))),
-        sha: cur.sha
-      })
+      headers: {'Authorization': 'Bearer ' + gToken, 'Content-Type': 'application/json'},
+      body: JSON.stringify({values: [headers, ...rows]})
     });
-    if(r2.ok) showToast('Сохранено в облако 🔐');
-    else { const e = await r2.json(); showToast('Ошибка: ' + (e.message||'?')); }
+    if(r.ok) showToast('Сохранено в Google Таблицу 📊');
+    else showToast('Ошибка: ' + (await r.text()).slice(0,100));
   } catch(e){ showToast('Ошибка: ' + e.message); }
 }
-// Load on startup
-setTimeout(loadFromCloud, 600);
-// Pre-fill token input
+
 setTimeout(() => {
-  const inp = document.getElementById('gh_token_input');
-  if(inp && localStorage.getItem('gh_token')) inp.value = localStorage.getItem('gh_token');
-}, 100);
+  const div = document.getElementById('gSignIn') || document.createElement('div');
+  div.id = 'gSignIn';
+  div.style.cssText = 'display:inline-block';
+  document.querySelector('button[onclick="saveToSheet()"]')?.parentNode?.insertBefore(div, document.querySelector('button[onclick="saveToSheet()"]'));
+  initGoogleAuth();
+}, 1500);
+setTimeout(loadFromSheet, 2000);
 
 document.getElementById('f_from').addEventListener('blur', () => autofillCountry('f_from'));
 document.getElementById('f_to').addEventListener('blur', () => autofillCountry('f_to'));
