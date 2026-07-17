@@ -966,7 +966,13 @@
       <span id="cbrRateNote" class="hint" style="margin:0;"></span>
       <button class="btn-primary" id="cbrRefreshBtn" onclick="refreshCbrRates()">Рассчитать маржинальность</button>
       <button class="btn-primary" onclick="exportExcel()">Excel</button>
-    </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin:0 0 16px;flex-wrap:wrap">
+      <button class="btn-primary" onclick="saveToCloud()" style="background:var(--green)">☁️ Sync</button>
+      <input id="gh_token_input" type="password" placeholder="GitHub токен (один раз)" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px">
+      <button onclick="localStorage.setItem('gh_token',document.getElementById('gh_token_input').value);showToast('Токен сохранён')" style="padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:var(--panel-2);cursor:pointer">💾</button>
+      </div>
+      <div id="toolbarExtra" style="display:flex;gap:8px;align-items:center;margin:0 0 16px"></div>
   </div>
   <div class="table-wrap">
     <table id="dataTable">
@@ -2562,28 +2568,11 @@ async function saveToCloud(){
 }
 // Load on startup
 setTimeout(loadFromCloud, 600);
-
-// Add sync+token UI to top
-const toolbar = document.querySelector('.toolbar') || document.querySelector('.card') || document.body;
-const syncDiv = document.createElement('div');
-syncDiv.style.cssText = 'display:flex;gap:8px;align-items:center;margin:12px 0;flex-wrap:wrap';
-syncDiv.innerHTML = `
-  <button class="btn-primary" onclick="saveToCloud()" style="background:var(--green)">☁️ Sync</button>
-  <input id="gh_token_input" type="password" placeholder="GitHub токен (один раз)"
-    style="flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px"
-    value="${localStorage.getItem('gh_token')||''}">
-  <button onclick="localStorage.setItem('gh_token', document.getElementById('gh_token_input').value);showToast('Токен сохранён')"
-    style="padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:var(--panel-2);cursor:pointer">💾</button>
-`;
-document.querySelector('.card')?.after(syncDiv);
-document.querySelector('.sub')?.after(syncDiv);
-
-// Also add sync button in export area
-document.querySelector('button[onclick="exportExcel()"]')?.insertAdjacentHTML('afterend',
-  ' <button class="btn-primary" onclick="saveToCloud()" style="background:var(--green)">☁️ Sync</button>');
-
-// Load from cloud on startup if available
-setTimeout(loadFromCloud, 500);
+// Pre-fill token input
+setTimeout(() => {
+  const inp = document.getElementById('gh_token_input');
+  if(inp && localStorage.getItem('gh_token')) inp.value = localStorage.getItem('gh_token');
+}, 100);
 
 document.getElementById('f_from').addEventListener('blur', () => autofillCountry('f_from'));
 document.getElementById('f_to').addEventListener('blur', () => autofillCountry('f_to'));
