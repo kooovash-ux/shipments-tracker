@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Поставки — учёт</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://accounts.google.com/gsi/client"></script>
 <style>
   :root{
     --green:#21A038;
@@ -970,9 +969,7 @@
       </div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;margin:0 0 12px;flex-wrap:wrap">
-        <button class="btn-primary" onclick="signIn()" style="background:var(--navy-soft)">🔑 Войти через Google</button>
-        <span id="gStatus" style="font-size:13px;color:var(--text-dim)"></span>
-        <button class="btn-primary" onclick="saveToSheet()" style="background:var(--green)">💾 Сохранить в таблицу</button>
+        <button class="btn-primary" onclick="saveToSheet()" style="background:var(--green)">💾 Скачать CSV (импорт в таблицу)</button>
         <button class="btn-primary" onclick="loadFromSheet()">📥 Загрузить из таблицы</button>
       </div>
       <div class="table-wrap">
@@ -2496,34 +2493,8 @@ function exportExcel(){
   XLSX.writeFile(wb, 'postavki.xlsx');
 }
 
-// ===== Google Sheets sync (через GIS OAuth, без паролей) =====
-const SHEET_ID = '1KYFzP4jAjbkyCrABvqO-6ZG5QhGtW_TF5DqRbQi8ze4';
+// ===== Google Sheets (только чтение, без авторизации) =====
 const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTEUQKvhT-uIBexAZadJaK7DcGn2w4ZWoL7GQxLPu70iBCsl7vklHZEwau5Oe7l1nJDUiiCvHsk_gVI/pub?output=csv';
-const CLIENT_ID = '1072295463604-9hj6hgmk4i85qr2vf2kgua7v2kg3u5ca.apps.googleusercontent.com';
-
-let gToken = localStorage.getItem('gs_token') || null;
-let tokenClient = null;
-
-function initGoogleAuth(){
-  tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: CLIENT_ID,
-    scope: 'https://www.googleapis.com/auth/spreadsheets',
-    callback: (resp) => {
-      if(resp.access_token){
-        gToken = resp.access_token;
-        localStorage.setItem('gs_token', gToken);
-        document.getElementById('gStatus').textContent = '✅ Вошли';
-        showToast('Вошли через Google ✅');
-      }
-    }
-  });
-  if(gToken) document.getElementById('gStatus').textContent = '✅ Есть токен';
-}
-
-function signIn(){
-  if(!tokenClient) initGoogleAuth();
-  tokenClient.requestAccessToken({prompt: 'consent'});
-}
 
 async function loadFromSheet(){
   try{
@@ -2540,25 +2511,22 @@ async function loadFromSheet(){
       entries.push(e);
     }
     saveState(); renderTable();
-    showToast('Загружено из Google Таблицы 📊');
+    showToast('Загружено из Google Таблицы');
   } catch(e){}
 }
 
 function saveToSheet(){
-  if(!gToken){ signIn(); return; }
   const headers = ['bitrix','from','to','client','cargo','status','cost_plan','cost_fact','sale_plan','sale_fact','margin'];
   const rows = entries.map(e => headers.map(h => e[h] || ''));
-  fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1?valueInputOption=RAW`, {
-    method: 'PUT',
-    headers: {'Authorization': 'Bearer ' + gToken, 'Content-Type': 'application/json'},
-    body: JSON.stringify({values: [headers, ...rows]})
-  }).then(r => {
-    if(r.ok) showToast('Сохранено в Google Таблицу 📊');
-    else r.text().then(t => showToast('Ошибка: ' + t.slice(0,80)));
-  }).catch(e => showToast('Ошибка: ' + e.message));
+  let csv = headers.join(',') + '\n' + rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'postavki.csv';
+  a.click();
+  showToast('CSV скачан. Открой Google Таблицу → Файл → Импорт → Загрузить');
 }
 
-setTimeout(initGoogleAuth, 1000);
 setTimeout(loadFromSheet, 2000);
 
 document.getElementById('f_from').addEventListener('blur', () => autofillCountry('f_from'));
