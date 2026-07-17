@@ -2502,14 +2502,21 @@ async function loadFromSheet(){
     if(!r.ok) return;
     const data = await r.json();
     if(!data || data.length === 0) return;
-    const keys = Object.keys(data[0]);
-    entries.length = 0;
-    data.forEach(row => {
-      let e = {costs: []};
-      keys.forEach(k => e[k] = row[k] || '');
-      entries.push(e);
-    });
-    saveState(); renderTable();
+    const parsed = data.map(row => {
+      try{
+        // Try to parse as JSON first
+        if(row.json && row.json.startsWith('{')) return JSON.parse(row.json);
+        // Fallback: flat row
+        let e = {costs: []};
+        Object.keys(row).forEach(k => e[k] = row[k] || '');
+        return e;
+      } catch(e){ return null; }
+    }).filter(e => e);
+    if(parsed.length > 0){
+      entries.length = 0;
+      entries.push(...parsed);
+      saveState(); renderTable();
+    }
   } catch(e){}
 }
 
@@ -2517,25 +2524,27 @@ function autoSave(){
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(async () => {
     if(!entries || entries.length === 0) return;
-    const headers = ['bitrix','from','to','client','cargo','status','cost_plan','cost_fact','sale_plan','sale_fact','margin'];
-    const rows = entries.map(e => {
-      let obj = {};
-      headers.forEach(h => obj[h] = e[h] || '');
-      return obj;
-    });
     try{
-      await fetch(API_URL + '/all', {method: 'DELETE'});
-      if(rows.length > 0){
-        await fetch(API_URL, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(rows)});
+      const rows = entries.map(e => ({json: JSON.stringify(e)}));
+      // Delete all first
+      const meta = await fetch(API_URL);
+      const existing = await meta.json();
+      for(let i = 0; i < existing.length; i++){
+        await fetch(API_URL + '/' + (i+1), {method: 'DELETE'}).catch(()=>{});
       }
+      // Insert
+      await fetch(API_URL, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(rows)
+      });
     } catch(e){}
   }, 1000);
 }
 
-// Patch saveState to auto-save
 const _origSave = saveState;
 saveState = function(){ _origSave(); autoSave(); };
 
+setTimeout(loadFromSheet, 1500);
 setTimeout(loadFromSheet, 1500);
 
 document.getElementById('f_from').addEventListener('blur', () => autofillCountry('f_from'));
