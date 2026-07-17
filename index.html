@@ -2489,29 +2489,56 @@ function exportExcel(){
   XLSX.writeFile(wb, 'postavki.xlsx');
 }
 
-// ===== Cloud sync via GitHub data.json =====
+// ===== Шифрование + облако (GitHub data.json) =====
 const DATA_URL = 'https://raw.githubusercontent.com/kooovash-ux/shipments-tracker/master/data.json';
 const API_URL = 'https://api.github.com/repos/kooovash-ux/shipments-tracker/contents/data.json';
+
+function getCryptoKey(){
+  const pwd = localStorage.getItem('crypt_pwd') || 'navayana2026';
+  const enc = new TextEncoder();
+  return crypto.subtle.importKey('raw', enc.encode(pwd.padEnd(16,'.').slice(0,16)),
+    {name:'AES-CBC'}, false, ['encrypt','decrypt']);
+}
+async function encryptData(obj){
+  const key = await getCryptoKey();
+  const iv = crypto.getRandomValues(new Uint8Array(16));
+  const data = new TextEncoder().encode(JSON.stringify(obj));
+  const encrypted = await crypto.subtle.encrypt({name:'AES-CBC', iv}, key, data);
+  const combined = new Uint8Array(iv.length + encrypted.byteLength);
+  combined.set(iv); combined.set(new Uint8Array(encrypted), iv.length);
+  return btoa(String.fromCharCode(...combined));
+}
+async function decryptData(str){
+  try{
+    const raw = Uint8Array.from(atob(str), c=>c.charCodeAt(0));
+    const iv = raw.slice(0,16);
+    const data = raw.slice(16);
+    const key = await getCryptoKey();
+    const decrypted = await crypto.subtle.decrypt({name:'AES-CBC', iv}, key, data);
+    return JSON.parse(new TextDecoder().decode(decrypted));
+  } catch(e){ return null; }
+}
 
 async function loadFromCloud(){
   try{
     const r = await fetch(DATA_URL);
     if(!r.ok) return;
     const cloud = await r.json();
-    if(cloud.entries && cloud.entries.length > 0){
+    if(!cloud.enc) return;
+    const decrypted = await decryptData(cloud.enc);
+    if(decrypted && decrypted.entries && decrypted.entries.length > 0){
       entries.length = 0;
-      entries.push(...cloud.entries);
-      saveState();
-      renderTable();
-      showToast('Загружено из облака');
+      entries.push(...decrypted.entries);
+      saveState(); renderTable();
+      showToast('Загружено из облака 🔐');
     }
   } catch(e){}
 }
 async function saveToCloud(){
   const token = localStorage.getItem('gh_token');
-  if(!token){ showToast('Сначала настрой токен: Настройки → GitHub токен'); return; }
+  if(!token){ showToast('Сначала вставь GitHub токен'); return; }
   try{
-    const content = btoa(unescape(encodeURIComponent(JSON.stringify({entries}))));
+    const enc = await encryptData({entries});
     const r = await fetch(API_URL, {
       method: 'GET', headers: {'Accept': 'application/vnd.github+json'}
     });
@@ -2525,14 +2552,16 @@ async function saveToCloud(){
       },
       body: JSON.stringify({
         message: 'Sync shipments data',
-        content: content,
+        content: btoa(unescape(encodeURIComponent(JSON.stringify({enc})))),
         sha: cur.sha
       })
     });
-    if(r2.ok){ showToast('Сохранено в облако ✅'); }
+    if(r2.ok) showToast('Сохранено в облако 🔐');
     else { const e = await r2.json(); showToast('Ошибка: ' + (e.message||'?')); }
-  } catch(e){ showToast('Ошибка сети: ' + e.message); }
+  } catch(e){ showToast('Ошибка: ' + e.message); }
 }
+// Load on startup
+setTimeout(loadFromCloud, 600);
 
 // Add sync+token UI to top
 const toolbar = document.querySelector('.toolbar') || document.querySelector('.card') || document.body;
