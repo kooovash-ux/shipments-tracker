@@ -2492,10 +2492,12 @@ function exportExcel(){
   XLSX.writeFile(wb, 'postavki.xlsx');
 }
 
-// ===== Загрузка данных с GitHub =====
+// ===== GitHub Sync =====
 const DATA_URL = 'https://raw.githubusercontent.com/kooovash-ux/shipments-tracker/master/data/seed.json';
+const API_URL = 'https://api.github.com/repos/kooovash-ux/shipments-tracker/contents/data/seed.json';
+let _saveTimer = null;
 
-async function loadSeed(){
+async function loadData(){
   try{
     const r = await fetch(DATA_URL);
     if(!r.ok) return;
@@ -2511,10 +2513,39 @@ async function loadSeed(){
   } catch(e){}
 }
 
-const _origSave = saveState;
-saveState = function(){ _origSave(); };
+function autoSave(){
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(async () => {
+    const token = localStorage.getItem('gh_token');
+    if(!token || !entries || entries.length === 0) return;
+    try{
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(entries))));
+      const r = await fetch(API_URL);
+      const meta = await r.json();
+      await fetch(API_URL, {
+        method: 'PUT',
+        headers: {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'},
+        body: JSON.stringify({message: 'Auto-sync', content: content, sha: meta.sha})
+      });
+    } catch(e){}
+  }, 2000);
+}
 
-setTimeout(loadSeed, 1500);
+const _origSave = saveState;
+saveState = function(){ _origSave(); autoSave(); };
+
+setTimeout(loadData, 1500);
+
+// Setup UI
+setTimeout(() => {
+  const div = document.createElement('div');
+  div.style.cssText = 'margin:8px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap';
+  div.innerHTML = '<input id="gh_token_inp" type="password" placeholder="GitHub токен (из файла)" style="flex:1;min-width:200px;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px">' +
+    '<button onclick="localStorage.setItem(\'gh_token\',document.getElementById(\'gh_token_inp\').value);showToast(\'Сохранён\')" style="padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:var(--panel-2);cursor:pointer">💾</button>';
+  const inp = div.querySelector('input');
+  if(localStorage.getItem('gh_token')) inp.value = localStorage.getItem('gh_token');
+  document.querySelector('.table-wrap')?.before(div);
+}, 1000);
 
 document.getElementById('f_from').addEventListener('blur', () => autofillCountry('f_from'));
 document.getElementById('f_to').addEventListener('blur', () => autofillCountry('f_to'));
