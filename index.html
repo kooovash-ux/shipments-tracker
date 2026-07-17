@@ -2489,6 +2489,73 @@ function exportExcel(){
   XLSX.writeFile(wb, 'postavki.xlsx');
 }
 
+// ===== Cloud sync via GitHub data.json =====
+const DATA_URL = 'https://raw.githubusercontent.com/kooovash-ux/shipments-tracker/master/data.json';
+const API_URL = 'https://api.github.com/repos/kooovash-ux/shipments-tracker/contents/data.json';
+
+async function loadFromCloud(){
+  try{
+    const r = await fetch(DATA_URL);
+    if(!r.ok) return;
+    const cloud = await r.json();
+    if(cloud.entries && cloud.entries.length > 0){
+      entries.length = 0;
+      entries.push(...cloud.entries);
+      saveState();
+      renderTable();
+      showToast('Загружено из облака');
+    }
+  } catch(e){}
+}
+async function saveToCloud(){
+  const token = localStorage.getItem('gh_token');
+  if(!token){ showToast('Сначала настрой токен: Настройки → GitHub токен'); return; }
+  try{
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify({entries}))));
+    const r = await fetch(API_URL, {
+      method: 'GET', headers: {'Accept': 'application/vnd.github+json'}
+    });
+    const cur = await r.json();
+    const r2 = await fetch(API_URL, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+        'Accept': 'application/vnd.github+json'
+      },
+      body: JSON.stringify({
+        message: 'Sync shipments data',
+        content: content,
+        sha: cur.sha
+      })
+    });
+    if(r2.ok){ showToast('Сохранено в облако ✅'); }
+    else { const e = await r2.json(); showToast('Ошибка: ' + (e.message||'?')); }
+  } catch(e){ showToast('Ошибка сети: ' + e.message); }
+}
+
+// Add sync+token UI to top
+const toolbar = document.querySelector('.toolbar') || document.querySelector('.card') || document.body;
+const syncDiv = document.createElement('div');
+syncDiv.style.cssText = 'display:flex;gap:8px;align-items:center;margin:12px 0;flex-wrap:wrap';
+syncDiv.innerHTML = `
+  <button class="btn-primary" onclick="saveToCloud()" style="background:var(--green)">☁️ Sync</button>
+  <input id="gh_token_input" type="password" placeholder="GitHub токен (один раз)"
+    style="flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px"
+    value="${localStorage.getItem('gh_token')||''}">
+  <button onclick="localStorage.setItem('gh_token', document.getElementById('gh_token_input').value);showToast('Токен сохранён')"
+    style="padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:var(--panel-2);cursor:pointer">💾</button>
+`;
+document.querySelector('.card')?.after(syncDiv);
+document.querySelector('.sub')?.after(syncDiv);
+
+// Also add sync button in export area
+document.querySelector('button[onclick="exportExcel()"]')?.insertAdjacentHTML('afterend',
+  ' <button class="btn-primary" onclick="saveToCloud()" style="background:var(--green)">☁️ Sync</button>');
+
+// Load from cloud on startup if available
+setTimeout(loadFromCloud, 500);
+
 document.getElementById('f_from').addEventListener('blur', () => autofillCountry('f_from'));
 document.getElementById('f_to').addEventListener('blur', () => autofillCountry('f_to'));
 </script>
