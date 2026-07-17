@@ -2384,7 +2384,7 @@ function exportExcel(){
     return;
   }
   const headers = ['№ поставки','№ Bitrix','Откуда','Куда','Клиент','Почта клиента','Телефон/телеграм клиента','Груз','Статус',
-    'Подрядчик (услуга)','Тип','Маршрут','Дата выхода','Дата прибытия/услуги',
+    'Подрядчики (услуги)','Типы','Маршруты','Даты','',
     'Себес план','Вал.','Себес факт','Вал.',
     'Счёт клиенту план','Вал.','Счёт клиенту факт','Вал.',
     'НДС себес','НДС продажа',
@@ -2396,7 +2396,6 @@ function exportExcel(){
     const combined = e.combinedSale && e.combinedSale.enabled;
     const headerVals = [idx+1, e.bitrix || '', e.from, e.to, e.client || '', e.clientEmail || '', e.clientContact || '', e.cargo || '', e.status];
     if(costs.length === 0){
-      // Entry with no contractors — one summary row
       const planT = computeTotals(e, false);
       const factT = computeTotals(e, true);
       const planMargin = (planT.hasSale && !planT.missingRate) ? Math.round(planT.marginRub) : '';
@@ -2404,62 +2403,97 @@ function exportExcel(){
       flatRows.push([...headerVals, '—','','','','','','','','','','','',planMargin,factMargin,'','']);
       return;
     }
+    // Collect all leg details for this entry
+    const legNames = [], legTypes = [], legRoutes = [], legDates = [];
+    let sumPlanCost = 0, sumPlanCur = '', sumFactCost = 0, sumFactCur = '';
+    let sumPlanSale = 0, sumPlanSaleCur = '', sumFactSale = 0, sumFactSaleCur = '';
+    let planCostOk = false, factCostOk = false, planSaleOk = false, factSaleOk = false;
+    let costVats = [], saleVats = [];
+    let allPaid = true, allReceived = true;
+    let sumPlanMargin = 0, sumFactMargin = 0;
+    let marginOk = false;
+
     costs.forEach(c => {
       const isMovement = (c.serviceType || 'Перемещение') === 'Перемещение';
       const route = isMovement ? ((c.from||'—') + ' → ' + (c.to||'—')) : '—';
       const dateVal = isMovement ? (c.depart ? fmtDate(c.depart) : '') : (c.serviceDate ? fmtDate(c.serviceDate) : '');
       const dateVal2 = isMovement ? (c.arrive ? fmtDate(c.arrive) : '') : '';
-      const serviceLabel = c.serviceType || '—';
-      const typeLabel = isMovement ? (c.transportType || '—') : '—';
-      const nameLabel = c.name || serviceLabel;
-      const planCostVal = c.planCost !== null ? c.planCost : '';
-      const planCostCur = c.planCost !== null ? (c.planCostCur || '') : '';
-      const factCostVal = c.factCost !== null ? c.factCost : '';
-      const factCostCur = c.factCost !== null ? (c.factCostCur || '') : '';
-      let planSaleVal = '', planSaleCur = '', factSaleVal = '', factSaleCur = '';
+      const dateStr = dateVal + (dateVal2 ? '–' + dateVal2 : '');
+      legNames.push(c.name || c.serviceType || '—');
+      legTypes.push(c.transportType || (c.serviceType || '—'));
+      legRoutes.push(route !== '—' ? route : '—');
+      legDates.push(dateStr || '—');
+
+      // Cost sums
+      if(c.planCost !== null){ sumPlanCost += c.planCost; planCostOk = true; sumPlanCur = c.planCostCur || ''; }
+      if(c.factCost !== null){ sumFactCost += c.factCost; factCostOk = true; sumFactCur = c.factCostCur || ''; }
+      // Sale sums
+      let ps = null, fs = null;
       if(combined){
-        planSaleVal = (e.combinedSale && e.combinedSale.planSale !== null) ? e.combinedSale.planSale : '';
-        planSaleCur = (e.combinedSale && e.combinedSale.planSale !== null) ? (e.combinedSale.planSaleCur || '') : '';
-        factSaleVal = (e.combinedSale && e.combinedSale.factSale !== null) ? e.combinedSale.factSale : '';
-        factSaleCur = (e.combinedSale && e.combinedSale.factSale !== null) ? (e.combinedSale.factSaleCur || '') : '';
+        ps = (e.combinedSale && e.combinedSale.planSale !== null) ? e.combinedSale.planSale : null;
+        fs = (e.combinedSale && e.combinedSale.factSale !== null) ? e.combinedSale.factSale : null;
+        if(ps !== null){ sumPlanSale = ps; planSaleOk = true; sumPlanSaleCur = e.combinedSale.planSaleCur || ''; }
+        if(fs !== null){ sumFactSale = fs; factSaleOk = true; sumFactSaleCur = e.combinedSale.factSaleCur || ''; }
       } else {
-        planSaleVal = c.planSale !== null ? c.planSale : '';
-        planSaleCur = c.planSale !== null ? (c.planSaleCur || '') : '';
-        factSaleVal = c.factSale !== null ? c.factSale : '';
-        factSaleCur = c.factSale !== null ? (c.factSaleCur || '') : '';
+        ps = c.planSale;
+        fs = c.factSale;
+        if(ps !== null){ sumPlanSale += ps; planSaleOk = true; sumPlanSaleCur = c.planSaleCur || ''; }
+        if(fs !== null){ sumFactSale += fs; factSaleOk = true; sumFactSaleCur = c.factSaleCur || ''; }
       }
-      // Leg margin
-      let planMargin = '', factMargin = '';
-      if(c.planCost !== null && planSaleVal !== '' && c.planCostCur === planSaleCur){
-        const saleNet = planSaleVal / (1 + (c.saleVat||0) / 100);
-        const costNet = c.planCost / (1 + (c.costVat||0) / 100);
-        const rate = cbrRates[c.planCostCur];
-        if(rate) planMargin = Math.round((saleNet - costNet) * rate);
+      // Vats
+      if(c.costVat !== undefined) costVats.push(c.costVat);
+      if(c.saleVat !== undefined) saleVats.push(c.saleVat);
+      // Paid/Received
+      if(c.paid === false) allPaid = false;
+      if(combined){
+        if(e.combinedSale && e.combinedSale.received === false) allReceived = false;
+      } else {
+        if(c.received === false) allReceived = false;
       }
-      if(c.factCost !== null && factSaleVal !== ''){
-        const saleNet = factSaleVal / (1 + (c.saleVat||0) / 100);
-        const costNet = c.factCost / (1 + (c.costVat||0) / 100);
-        factMargin = Math.round(saleNet - costNet);
-      } else if(c.factCost !== null && c.planSale !== null && c.planCostCur === c.planSaleCur && combined){
-        // Combined: use the fact cost with plan sale as approximation
+      // Per-leg margin for aggregate
+      let pm = '', fm = '';
+      if(c.planCost !== null && ((combined && e.combinedSale && e.combinedSale.planSale !== null) || (!combined && c.planSale !== null))){
+        const sp = combined ? e.combinedSale.planSale : c.planSale;
+        if(c.planCostCur === sumPlanCur){
+          const saleNet = sp / (1 + ((c.saleVat||0) / 100));
+          const costNet = c.planCost / (1 + ((c.costVat||0) / 100));
+          const rate = cbrRates[c.planCostCur];
+          if(rate){ pm = Math.round((saleNet - costNet) * rate); sumPlanMargin += pm; }
+        }
       }
-      const paid = c.paid ? 'Да' : (c.paid === false ? 'Нет' : '');
-      const received = combined
-        ? (e.combinedSale && e.combinedSale.received ? 'Да' : 'Нет')
-        : (c.received ? 'Да' : (c.received === false ? 'Нет' : ''));
-      flatRows.push([...headerVals, nameLabel, typeLabel, route, dateVal, dateVal2,
-        planCostVal, planCostCur, factCostVal, factCostCur,
-        planSaleVal, planSaleCur, factSaleVal, factSaleCur,
-        (c.costVat||0)+'%', (c.saleVat||0)+'%',
-        planMargin, factMargin, paid, received]);
+      if(c.factCost !== null && ((combined && e.combinedSale && e.combinedSale.factSale !== null) || (!combined && c.factSale !== null))){
+        const sf = combined ? e.combinedSale.factSale : c.factSale;
+        const saleNet = sf / (1 + ((c.saleVat||0) / 100));
+        const costNet = c.factCost / (1 + ((c.costVat||0) / 100));
+        fm = Math.round(saleNet - costNet); sumFactMargin += fm;
+      }
     });
+
+    // Combine vat labels
+    const costVatLabel = costVats.length > 0 ? [...new Set(costVats)].map(v => v+'%').join('/') : '';
+    const saleVatLabel = saleVats.length > 0 ? [...new Set(saleVats)].map(v => v+'%').join('/') : '';
+
+    flatRows.push([...headerVals,
+      legNames.join('; '),
+      [...new Set(legTypes)].join('; '),
+      [...new Set(legRoutes)].join('; '),
+      legDates.filter(d => d !== '—').join('; '),
+      '',
+      planCostOk ? sumPlanCost : '', sumPlanCur,
+      factCostOk ? sumFactCost : '', sumFactCur,
+      planSaleOk ? sumPlanSale : '', sumPlanSaleCur,
+      factSaleOk ? sumFactSale : '', sumFactSaleCur,
+      costVatLabel, saleVatLabel,
+      sumPlanMargin || '', sumFactMargin || '',
+      allPaid ? 'Да' : 'Нет', allReceived ? 'Да' : 'Нет'
+    ]);
   });
   if(flatRows.length === 0){
     showToast('Нет данных для выгрузки');
     return;
   }
   const ws = XLSX.utils.aoa_to_sheet([headers, ...flatRows]);
-  ws['!cols'] = headers.map(h => ({wch: Math.max(12, h.length + 2)}));
+  ws['!cols'] = headers.map(h => ({wch: Math.max(14, h.length + 2)}));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Поставки');
   XLSX.writeFile(wb, 'postavki.xlsx');
