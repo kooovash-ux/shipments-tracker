@@ -2493,41 +2493,49 @@ function exportExcel(){
   XLSX.writeFile(wb, 'postavki.xlsx');
 }
 
-// ===== Google Sheets (только чтение, без авторизации) =====
-const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTEUQKvhT-uIBexAZadJaK7DcGn2w4ZWoL7GQxLPu70iBCsl7vklHZEwau5Oe7l1nJDUiiCvHsk_gVI/pub?output=csv';
+// ===== Sheet.best API (Google Sheets) =====
+const API_URL = 'https://api.sheetbest.com/sheets/4828e86e-bd53-4ce7-a09e-ae1e13b196eb';
 
 async function loadFromSheet(){
   try{
-    const r = await fetch(SHEET_CSV);
-    const csv = await r.text();
-    const lines = csv.trim().split('\n').filter(l => l);
-    if(lines.length < 2) return;
-    const keys = lines[0].split(',').map(k => k.trim());
+    const r = await fetch(API_URL);
+    if(!r.ok) return;
+    const data = await r.json();
+    if(!data || data.length === 0) return;
+    const keys = Object.keys(data[0]);
     entries.length = 0;
-    for(let i = 1; i < lines.length; i++){
-      const vals = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
+    data.forEach(row => {
       let e = {costs: []};
-      keys.forEach((k, j) => e[k] = vals[j] || '');
+      keys.forEach(k => e[k] = row[k] || '');
       entries.push(e);
-    }
+    });
     saveState(); renderTable();
-    showToast('Загружено из Google Таблицы');
+    showToast('Загружено из Google Таблицы ✅');
   } catch(e){}
 }
 
-function saveToSheet(){
+async function saveToSheet(){
   const headers = ['bitrix','from','to','client','cargo','status','cost_plan','cost_fact','sale_plan','sale_fact','margin'];
-  const rows = entries.map(e => headers.map(h => e[h] || ''));
-  let csv = headers.join(',') + '\n' + rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\n');
-  const blob = new Blob([csv], {type:'text/csv'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'postavki.csv';
-  a.click();
-  showToast('CSV скачан. Открой Google Таблицу → Файл → Импорт → Загрузить');
+  const rows = entries.map(e => {
+    let obj = {};
+    headers.forEach(h => obj[h] = e[h] || '');
+    return obj;
+  });
+  try{
+    // Delete all then re-insert
+    await fetch(API_URL + '/all', {method: 'DELETE'});
+    if(rows.length > 0){
+      await fetch(API_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(rows)
+      });
+    }
+    showToast('Сохранено в Google Таблицу ✅');
+  } catch(e){ showToast('Ошибка: ' + e.message); }
 }
 
-setTimeout(loadFromSheet, 2000);
+setTimeout(loadFromSheet, 1500);
 
 document.getElementById('f_from').addEventListener('blur', () => autofillCountry('f_from'));
 document.getElementById('f_to').addEventListener('blur', () => autofillCountry('f_to'));
